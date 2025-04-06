@@ -1,39 +1,33 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import InitialLayout from "@/components/InitialLayout";
+import Colors from "@/constants/colors";
+import ClerkAndConvexProvider from "@/providers/ClerkAndConvexProvider";
+import * as NavigationBar from "expo-navigation-bar";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect } from "react";
+import { LogBox, Platform } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+LogBox.ignoreLogs(["Clerk: Clerk has been loaded with development keys"]);
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
+const _layout = () => {
+  // UPDATE NATIVE NAVIGATION BAR ON ANDROID
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    if (Platform.OS === "android") {
+      NavigationBar.setBackgroundColorAsync(Colors.background);
+      NavigationBar.setButtonStyleAsync("light");
     }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <ClerkAndConvexProvider>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
+          <InitialLayout />
+        </SafeAreaView>
+      </SafeAreaProvider>
+      <StatusBar style="dark" backgroundColor={Colors.background} />
+    </ClerkAndConvexProvider>
   );
-}
+};
+
+export default _layout;
