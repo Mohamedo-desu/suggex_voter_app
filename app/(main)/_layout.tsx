@@ -1,15 +1,44 @@
-import { Stack } from "expo-router";
+import { useUser } from "@clerk/clerk-expo";
+import { Redirect, Stack } from "expo-router";
 import React from "react";
 
 const MainLayout = () => {
+  const { user } = useUser();
+
+  if (!user) return <Redirect href={"/(auth)"} />;
+
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
       }}
     >
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="create" />
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="create"
+        options={{
+          presentation: "modal",
+          animation: "slide_from_bottom",
+          title: "Create Suggestion",
+          headerTitleAlign: "center",
+        }}
+      />
+
+      <Stack.Screen
+        name="settings"
+        options={{
+          presentation: "modal",
+          animation: "slide_from_bottom",
+          title: "Manage Settings",
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 };
