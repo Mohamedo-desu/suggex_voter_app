@@ -1,6 +1,9 @@
+import Colors from "@/constants/colors";
 import { useUser } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Stack } from "expo-router";
 import React from "react";
+import { TouchableOpacity } from "react-native";
 
 const MainLayout = () => {
   const { user } = useUser();
@@ -37,6 +40,24 @@ const MainLayout = () => {
           animation: "slide_from_bottom",
           title: "Manage Settings",
           headerTitleAlign: "center",
+        }}
+      />
+      <Stack.Screen
+        name="groupDetails"
+        options={{
+          title: "",
+          headerTitleAlign: "center",
+          headerRight: (props) => (
+            <TouchableOpacity
+              style={{ marginRight: 15 }}
+              activeOpacity={0.8}
+              hitSlop={10}
+              onPress={() => undefined}
+              {...props}
+            >
+              <Ionicons name="share-outline" size={25} color={Colors.primary} />
+            </TouchableOpacity>
+          ),
         }}
       />
     </Stack>

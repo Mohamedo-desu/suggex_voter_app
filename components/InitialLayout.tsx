@@ -18,7 +18,7 @@ const InitialLayout = () => {
     if (!isSignedIn && !inAuthScreen) {
       router.replace("/(auth)");
     } else if (isSignedIn && inAuthScreen) {
-      router.replace("/(main)/(tabs)/suggestions");
+      router.replace("/(main)/(tabs)");
     }
   }, [isLoaded, isSignedIn, segments]);
 

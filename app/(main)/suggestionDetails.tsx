@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 const SuggestionDetails = () => {
   return (
     <View>
-      <Text>SuggestionDetails</Text>
+      <Text>suggestionDetails</Text>
     </View>
   );
 };

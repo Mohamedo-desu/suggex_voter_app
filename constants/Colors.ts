@@ -12,6 +12,10 @@ const ColorThemes = {
     border: "#c8e6c9",
     white: "#ffffff",
     black: "#000000",
+    error: "#FF3D00",
+    warning: "#FFA500",
+    success: "#0acf45",
+    invited: "#BA68C8",
   },
   RETRO: {
     primary: "#e17055",
@@ -101,6 +105,6 @@ export const getRandomColors = () => {
 };
 
 // Default export (set the default to FOREST or change as needed)
-const Colors = getRandomColors();
+const Colors = ColorThemes.FOREST;
 
-export default ColorThemes.FOREST;
+export default Colors;

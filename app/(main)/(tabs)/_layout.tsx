@@ -17,7 +17,7 @@ const TabsLayout = () => {
       }}
     >
       <Tabs.Screen
-        name="suggestions"
+        name="index"
         options={{
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="home" size={size} color={color} />
