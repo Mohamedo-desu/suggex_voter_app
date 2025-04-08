@@ -13,23 +13,11 @@ import Animated, {
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { SuggestionProps } from "@/types";
 import { router } from "expo-router";
 
-interface SuggestionDetailsData {
-  _id: Id<"suggestions">;
-  userId: string;
-  title: string;
-  description: string;
-  status: "open" | "closed" | string;
-  _creationTime: number | Date;
-  likesCount: number;
-  commentsCount: number;
-  endGoal: number;
-}
-
 interface SuggestionDetailsCardProps {
-  item: SuggestionDetailsData;
+  item: SuggestionProps;
   userId?: string;
 }
 

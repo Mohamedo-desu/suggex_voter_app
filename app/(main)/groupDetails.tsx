@@ -6,7 +6,7 @@ import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { SuggestionItemProps } from "@/types";
+import { GroupProps, SuggestionProps } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -34,11 +34,11 @@ const GroupDetails: FC = () => {
   // Query group details.
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {
     groupId: groupId as Id<"groups">,
-  });
+  }) as GroupProps;
 
   // Render each suggestion item.
-  const renderItem = ({ item }: { item: SuggestionItemProps }) => (
-    <Suggestion item={item} userId={user?.id} />
+  const renderItem = ({ item }: { item: SuggestionProps }) => (
+    <Suggestion item={item} userId={user.id} />
   );
 
   const navigation = useNavigation();

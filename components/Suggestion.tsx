@@ -1,7 +1,7 @@
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
-import { SuggestionItemProps } from "@/types";
+import { SuggestionProps } from "@/types";
 import {
   FontAwesome5,
   Ionicons,
@@ -26,7 +26,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const Suggestion: FC<{ item: SuggestionItemProps; userId: string }> = ({
+const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   item,
   userId,
 }) => {

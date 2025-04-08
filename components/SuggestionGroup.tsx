@@ -1,3 +1,6 @@
+import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
+import { GroupItemProps } from "@/types";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "expo-router";
@@ -13,27 +16,7 @@ import {
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-
-// Define the item type
-interface SuggestionGroupItem {
-  _id: string;
-  groupName: string;
-  _creationTime: number | Date;
-  suggestionsCount: number;
-  approvedCount: number;
-  rejectedCount: number;
-  role: "owner" | "member" | string;
-  status: "open" | "closed" | string;
-}
-
-// Props for the component
-interface SuggestionGroupProps {
-  item: SuggestionGroupItem | null;
-}
-
-const SuggestionGroup: React.FC<SuggestionGroupProps> = ({ item }) => {
+const SuggestionGroup: React.FC<{ item: GroupItemProps }> = ({ item }) => {
   const router = useRouter();
 
   if (!item) return null;

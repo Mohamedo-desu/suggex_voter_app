@@ -3,23 +3,22 @@ import Loader from "@/components/Loader";
 import SuggestionGroup from "@/components/SuggestionGroup";
 import Colors from "@/constants/colors";
 import { api } from "@/convex/_generated/api";
-import { useAuth } from "@clerk/clerk-expo";
+import { GroupItemProps } from "@/types";
 import { useQuery } from "convex/react";
 import React, { useState } from "react";
 import { FlatList, RefreshControl, StyleSheet } from "react-native";
 
 const SuggestionsScreen = () => {
-  const { signOut } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
-  const groups = useQuery(api.suggestion.fetchUserGroups);
+  const groups = useQuery(api.suggestion.fetchUserGroups) as GroupItemProps[];
 
   const onRefresh = () => {
     setRefreshing(true);
     setRefreshing(false);
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: { item: GroupItemProps }) => {
     return <SuggestionGroup item={item} />;
   };
 

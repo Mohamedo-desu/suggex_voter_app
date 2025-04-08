@@ -5,6 +5,7 @@ import SuggestionGroup from "@/components/SuggestionGroup";
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
+import { GroupItemProps, SuggestionProps } from "@/types";
 import { debounce } from "@/utils/functions";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,33 +19,10 @@ import {
   View,
 } from "react-native";
 
-// Define type for search mode.
-type SearchType = "group" | "suggestion";
-
-// Define types for Group and Suggestion search items.
-interface GroupItem {
-  _id: string;
-  groupName: string;
-  invitationCode: string;
-  userId: string;
-}
-
-interface SuggestionItem {
-  _id: string;
-  title: string;
-  invitationCode: string;
-}
-
-// Union type for a search item.
-type SearchItemType = GroupItem | SuggestionItem;
-
-// Props for the RenderItem component.
-interface RenderItemProps {
-  item: SearchItemType;
-}
-
 const SearchScreen: React.FC = () => {
-  const [result, setResult] = useState<SearchItemType | null>(null);
+  const [result, setResult] = useState<GroupItemProps | SuggestionProps | null>(
+    null
+  );
   const [searchPhrase, setSearchPhrase] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [resultType, setResultType] = useState<string | null>(null);
@@ -152,9 +130,9 @@ const SearchScreen: React.FC = () => {
             <Text style={styles.resultHeader}>Result</Text>
 
             {resultType === "group" ? (
-              <SuggestionGroup item={result} />
+              <SuggestionGroup item={result as GroupItemProps} />
             ) : (
-              <Suggestion item={result} userId={user.id} />
+              <Suggestion item={result as SuggestionProps} userId={user.id} />
             )}
             {currentUser?._id !== result.userId && (
               <View style={styles.footerContainer}>

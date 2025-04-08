@@ -4,6 +4,7 @@ import Loader from "@/components/Loader";
 import SuggestionDetailsCard from "@/components/SuggestionDetailsCard";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { SuggestionProps } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
 import { useQuery } from "convex/react";
 import { router, useLocalSearchParams } from "expo-router";
@@ -15,7 +16,7 @@ const SuggestionDetails: FC = () => {
 
   const suggestionDetails = useQuery(api.suggestion.fetchSuggestionDetails, {
     suggestionId: suggestionId as Id<"suggestions">,
-  });
+  }) as SuggestionProps;
 
   const comments = useQuery(api.comment.fetchComments, {
     suggestionId: suggestionId as Id<"suggestions">,

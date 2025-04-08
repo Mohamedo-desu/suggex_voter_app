@@ -26,7 +26,9 @@ import {
 const CreateScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
-  const [newGroupStatus, setNewGroupStatus] = useState("open");
+  const [newGroupStatus, setNewGroupStatus] = useState<"open" | "closed">(
+    "open"
+  );
   const [addingNewGroup, setAddingNewGroup] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const addGroup = useMutation(api.suggestion.addGroup);
@@ -35,7 +37,7 @@ const CreateScreen = () => {
   const { width } = useWindowDimensions();
   const router = useRouter();
 
-  const handleSubmitForm = async (values, resetForm) => {
+  const handleSubmitForm = async (values: any, resetForm: any) => {
     try {
       setSubmitting(true);
       if (!values.group) {

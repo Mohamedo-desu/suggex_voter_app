@@ -20,7 +20,7 @@ export interface GroupProps {
   invitationCode: string;
   groupName: string;
   suggestionsCount: number;
-  status?: string;
+  status: string;
   _creationTime: number | Date;
 }
 
@@ -44,8 +44,8 @@ export interface SuggestionProps {
   description: string;
   commentsCount: number;
   likesCount: number;
-  endGoal?: number;
-  status?: string;
+  endGoal: number;
+  status: string;
   _creationTime: number | Date;
 }
 
@@ -96,30 +96,4 @@ export interface NotificationProps {
   suggestionId?: Id<"suggestions">;
   commentId?: Id<"comments">;
   _creationTime: number | Date;
-}
-
-/** UI-specific props for rendering suggestion list items. */
-export interface SuggestionItemProps {
-  _id: Id<"suggestions">;
-  title: string;
-  description: string;
-  _creationTime: number | Date;
-  likesCount: number;
-  commentsCount: number;
-  userId: string;
-  status: "approved" | "rejected" | "closed" | string;
-  endGoal: number;
-}
-
-/** UI-specific props for rendering group list items. */
-export interface GroupItemProps {
-  _id: string;
-  userId: string;
-  groupName: string;
-  role: string;
-  status: "open" | "closed" | string;
-  _creationTime: number | Date;
-  suggestionsCount: number;
-  approvedCount: number;
-  rejectedCount: number;
 }
