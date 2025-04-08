@@ -9,7 +9,6 @@ const Loader = ({ size = "large" }: { size?: "small" | "large" }) => {
       style={[
         {
           flex: 1,
-          backgroundColor: Colors.background,
           justifyContent: "center",
           alignItems: "center",
         },

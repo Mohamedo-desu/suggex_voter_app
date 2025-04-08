@@ -1,11 +1,22 @@
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
+import { router } from "expo-router";
 import React, { FC, useCallback, useEffect, useMemo } from "react";
 import {
   Alert,
   GestureResponderEvent,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,14 +27,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { router } from "expo-router";
-
 interface SuggestionItem {
-  _id: string;
+  _id: Id<"suggestions">;
   title: string;
   description: string;
   _creationTime: number | Date;
@@ -40,6 +45,10 @@ interface SuggestionProps {
 }
 
 const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
+  const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
+
+  const isPrivate: boolean = item.status === "private";
+
   // Memoize formatted creation time
   const creationTimeFormatted = useMemo(
     () =>
@@ -71,7 +80,7 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
             onPress: async () => {
               try {
                 // Call your delete mutation here.
-                // await deleteSuggestion({ suggestionId: item._id });
+                await deleteSuggestion({ suggestionId: item._id });
               } catch (error) {
                 console.error("Failed to delete suggestion:", error);
               }
@@ -96,8 +105,9 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
       item.status === "rejected" && styles.rejected,
       item.status === "approved" && styles.approved,
       isClosed && styles.closed,
+      isPrivate && styles.private,
     ],
-    [item.status, isClosed]
+    [item.status, isClosed, isPrivate]
   );
 
   // Memoize progress calculation
@@ -122,7 +132,7 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
     <TouchableOpacity
       style={containerStyle}
       activeOpacity={0.8}
-      disabled={isClosed}
+      disabled={isClosed || isPrivate}
       onPress={() =>
         router.navigate({
           pathname: "/(main)/suggestionDetails",
@@ -132,7 +142,7 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
     >
       <View style={styles.iconContainer}>
         <MaterialCommunityIcons
-          name="newspaper-variant-outline"
+          name={isPrivate ? "lock" : "newspaper-variant"}
           size={15}
           color={Colors.placeholderText}
         />
@@ -172,25 +182,35 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
           ].map(({ label, count }) => (
             <View key={label} style={styles.statItemContainer}>
               <Text style={styles.statLabel}>{label} : </Text>
-              <AnimatedNumber
-                animateToNumber={count}
-                animationDuration={1000}
-                fontStyle={styles.statNumber}
-                includeComma
-              />
+              {isPrivate ? (
+                <Ionicons
+                  name="eye-off"
+                  size={14}
+                  color={Colors.lightGray[500]}
+                />
+              ) : (
+                <AnimatedNumber
+                  animateToNumber={count}
+                  animationDuration={1000}
+                  fontStyle={styles.statNumber as TextStyle}
+                  includeComma={true}
+                />
+              )}
             </View>
           ))}
         </View>
       </View>
       {/* Progress bar */}
-      <View style={styles.progressWrapper}>
-        <View style={styles.progressBarContainer}>
-          <Animated.View
-            style={[styles.progressBarFill, progressAnimatedStyle]}
-          />
+      {isOwner && (
+        <View style={styles.progressWrapper}>
+          <View style={styles.progressBarContainer}>
+            <Animated.View
+              style={[styles.progressBarFill, progressAnimatedStyle]}
+            />
+          </View>
+          <Text style={styles.progressText}>{Math.round(progress)}%</Text>
         </View>
-        <Text style={styles.progressText}>{Math.round(progress)}%</Text>
-      </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -213,6 +233,10 @@ const styles = StyleSheet.create({
   approved: {
     borderLeftWidth: 4,
     borderLeftColor: Colors.primary,
+  },
+  private: {
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.invited,
   },
   closed: {
     opacity: 0.5,

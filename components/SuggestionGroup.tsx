@@ -1,4 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
@@ -50,11 +50,12 @@ const SuggestionGroup: React.FC<SuggestionGroupProps> = ({ item }) => {
   } = item;
 
   const groupActive: boolean = status === "open";
+  const isPrivate: boolean = status === "private";
 
   const borderColor: string = useMemo(() => {
-    if (!groupActive) return Colors.error;
+    if (!groupActive && !isPrivate) return Colors.error;
     return role === "owner" ? Colors.primary : Colors.invited;
-  }, [groupActive, role]);
+  }, [groupActive, role, isPrivate]);
 
   const displayName: string = useMemo(() => {
     return groupName.length > 25 ? groupName.slice(0, 25) + "..." : groupName;
@@ -63,9 +64,12 @@ const SuggestionGroup: React.FC<SuggestionGroupProps> = ({ item }) => {
   const containerStyle: StyleProp<ViewStyle> = useMemo(
     () => [
       styles.container,
-      { borderBottomColor: borderColor, opacity: groupActive ? 1 : 0.6 },
+      {
+        borderBottomColor: borderColor,
+        opacity: groupActive || isPrivate ? 1 : 0.6,
+      },
     ],
-    [borderColor, groupActive]
+    [borderColor, groupActive, isPrivate]
   );
 
   return (
@@ -78,11 +82,11 @@ const SuggestionGroup: React.FC<SuggestionGroupProps> = ({ item }) => {
         })
       }
       activeOpacity={0.8}
-      disabled={!groupActive}
+      disabled={!groupActive || isPrivate}
     >
       <View style={styles.iconContainer}>
         <FontAwesome5
-          name={groupActive ? "box-open" : "box"}
+          name={isPrivate ? "lock" : groupActive ? "box-open" : "box"}
           size={20}
           color={Colors.placeholderText}
         />
@@ -109,12 +113,20 @@ const SuggestionGroup: React.FC<SuggestionGroupProps> = ({ item }) => {
         ].map(({ label, count }) => (
           <View key={label} style={styles.statItemContainer}>
             <Text style={styles.statLabel}>{label} : </Text>
-            <AnimatedNumber
-              animateToNumber={count}
-              animationDuration={1000}
-              fontStyle={styles.statNumber as TextStyle}
-              includeComma={true}
-            />
+            {isPrivate ? (
+              <Ionicons
+                name="eye-off"
+                size={14}
+                color={Colors.lightGray[500]}
+              />
+            ) : (
+              <AnimatedNumber
+                animateToNumber={count}
+                animationDuration={1000}
+                fontStyle={styles.statNumber as TextStyle}
+                includeComma={true}
+              />
+            )}
           </View>
         ))}
       </View>
@@ -160,9 +172,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 10,
   },
   statItemContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
   },

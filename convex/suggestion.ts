@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { nanoid } from "nanoid";
 import { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { getAuthenticatedUser } from "./user";
@@ -82,8 +83,14 @@ export const addGroup = mutation({
     const currentUser = await getAuthenticatedUser(ctx);
     const userId = currentUser._id;
 
+    const generateRandomString = nanoid(5);
+    const generateRandomString2 = nanoid(5);
+
+    const invitationCode = `grp${generateRandomString}${userId}${generateRandomString2}G0g`;
+
     const groupId = await db.insert("groups", {
       userId,
+      invitationCode,
       groupName: args.groupName,
       suggestionsCount: 0,
       status: args.status,
@@ -148,8 +155,14 @@ export const addSuggestion = mutation({
       throw new Error("Group not found");
     }
 
+    const generateRandomString = nanoid(5);
+    const generateRandomString2 = nanoid(5);
+
+    const invitationCode = `sug${generateRandomString}${args.groupId}${generateRandomString2}S0s`;
+
     await db.insert("suggestions", {
       groupId: args.groupId,
+      invitationCode,
       description: args.suggestionDescription,
       title: args.suggestionTitle,
       commentsCount: 0,
@@ -161,6 +174,9 @@ export const addSuggestion = mutation({
 
     await db.patch(args.groupId, {
       suggestionsCount: group.suggestionsCount + 1,
+    });
+    await db.patch(currentUser._id, {
+      suggestionsCount: currentUser.suggestionsCount + 1,
     });
   },
 });
@@ -417,6 +433,17 @@ export const deleteSuggestion = mutation({
     // Finally, delete the suggestion itself.
     await db.delete(suggestionId);
 
+    // decrement user suggestion and group suggestion
+    await db.patch(currentUser._id, {
+      suggestionsCount: Math.max(0, (currentUser.suggestionsCount || 1) - 1),
+    });
+    const group = await db.get(suggestion.groupId);
+    if (!group) throw new Error("Group not found");
+
+    await db.patch(suggestion.groupId, {
+      suggestionsCount: Math.max(0, (group.suggestionsCount || 1) - 1),
+    });
+
     return true;
   },
 });
@@ -432,5 +459,107 @@ export const fetchSuggestionDetails = query({
       throw new Error("Suggestion not found");
     }
     return suggestion;
+  },
+});
+
+export const searchGroupsByInvitationCode = mutation({
+  args: { invitationCode: v.string() },
+  handler: async (ctx, { invitationCode }) => {
+    const { db } = ctx;
+
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const group = await db
+      .query("groups")
+      .withIndex("search_invitation", (q) =>
+        q.eq("invitationCode", invitationCode)
+      )
+      .first();
+
+    if (!group) throw new Error("Group not found");
+
+    const isOwner = group.userId === currentUser._id;
+
+    if (group.status === "closed" && !isOwner) {
+      throw new Error("Group was closed");
+    }
+
+    let foundGroup;
+
+    if (isOwner) {
+      const approvedCount = (
+        await db
+          .query("suggestions")
+          .withIndex("by_both", (q) =>
+            q.eq("groupId", group._id).eq("status", "approved")
+          )
+          .collect()
+      ).length;
+      const rejectedCount = (
+        await db
+          .query("suggestions")
+          .withIndex("by_both", (q) =>
+            q.eq("groupId", group._id).eq("status", "rejected")
+          )
+          .collect()
+      ).length;
+
+      foundGroup = {
+        ...group,
+        approvedCount,
+        rejectedCount,
+        role: "owner",
+      };
+
+      return foundGroup;
+    }
+
+    foundGroup = {
+      ...group,
+      groupName: "Private",
+      suggestionsCount: 0,
+      approvedCount: 0,
+      rejectedCount: 0,
+      role: "invited",
+      status: "private",
+    };
+
+    return foundGroup;
+  },
+});
+
+export const searchSuggestionsByInvitationCode = mutation({
+  args: { invitationCode: v.string() },
+  handler: async (ctx, { invitationCode }) => {
+    const { db } = ctx;
+
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const suggestion = await db
+      .query("suggestions")
+      .withIndex("search_invitation", (q) =>
+        q.eq("invitationCode", invitationCode)
+      )
+      .first();
+
+    const isOwner = suggestion?.userId === currentUser._id;
+
+    let foundSuggestion;
+
+    if (isOwner) {
+      return suggestion;
+    }
+
+    foundSuggestion = {
+      ...suggestion,
+      title: "Private",
+      description: "private",
+      commentsCount: 0,
+      endGoal: 0,
+      likesCount: 0,
+      status: "private",
+    };
+
+    return foundSuggestion;
   },
 });

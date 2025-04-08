@@ -18,12 +18,14 @@ export default defineSchema({
   // Groups table: stores group info.
   groups: defineTable({
     userId: v.id("users"), // creator or owner
+    invitationCode: v.string(),
     groupName: v.string(),
     suggestionsCount: v.number(),
     status: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
-    .index("by_groupName", ["groupName"]),
+    .index("by_groupName", ["groupName"])
+    .index("search_invitation", ["invitationCode"]),
 
   // Group Invitations table: establishes a many-to-many relation between groups and users.
   groupInvitations: defineTable({
@@ -38,7 +40,8 @@ export default defineSchema({
 
   // Suggestions table: stores suggestion details and related metadata.
   suggestions: defineTable({
-    userId: v.id("users"), // suggestion creator
+    userId: v.id("users"),
+    invitationCode: v.string(),
     groupId: v.id("groups"),
     title: v.string(),
     description: v.string(),
@@ -50,6 +53,7 @@ export default defineSchema({
     .index("by_group", ["groupId"])
     .index("status", ["status"])
     .index("by_both", ["groupId", "status"])
+    .index("search_invitation", ["invitationCode"])
     .searchIndex("search_title", {
       searchField: "title",
     })

@@ -1,5 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import React, { FC, useEffect, useMemo } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -13,9 +13,11 @@ import Animated, {
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { router } from "expo-router";
 
 interface SuggestionDetailsData {
-  _id: string;
+  _id: Id<"suggestions">;
   userId: string;
   title: string;
   description: string;
@@ -35,6 +37,8 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   item,
   userId,
 }) => {
+  const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
+
   // Fetch authenticated user details if a userId is provided.
   const currentUser = useQuery(
     api.user.getUserByClerkId,
@@ -69,7 +73,8 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
           onPress: async () => {
             try {
               // TODO: call deleteSuggestion mutation.
-              console.log("Deleting suggestion", item._id);
+              await deleteSuggestion({ suggestionId: item._id });
+              router.back();
             } catch (error) {
               console.error("Failed to delete suggestion:", error);
             }

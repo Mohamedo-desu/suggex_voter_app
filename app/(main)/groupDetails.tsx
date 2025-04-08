@@ -1,26 +1,27 @@
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import Suggestion from "@/components/Suggestion";
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
+import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/clerk-expo";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { FC, useEffect } from "react";
 import {
   Alert,
   FlatList,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
-
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import { api } from "@/convex/_generated/api";
 
 /** Defines the details returned for a group. */
 interface GroupDetailsData {
@@ -176,6 +177,32 @@ const GroupDetails: FC = () => {
       </View>
     );
   };
+
+  const navigation = useNavigation();
+
+  const onShare = async () => {
+    try {
+      Clipboard.setString(groupDetails?.invitationCode);
+      ToastAndroid.show("Copied to clipboard", ToastAndroid.SHORT);
+    } catch (error) {
+      console.log("Error sharing:", error);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: (props) => (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          hitSlop={10}
+          onPress={onShare}
+          {...props}
+        >
+          <Ionicons name="share-outline" size={25} color={Colors.primary} />
+        </TouchableOpacity>
+      ),
+    });
+  }, []);
 
   // Navigate back automatically if the group is inactive.
   useEffect(() => {

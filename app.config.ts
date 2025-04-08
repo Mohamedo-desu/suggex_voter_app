@@ -26,7 +26,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: "1.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
-    userInterfaceStyle: "automatic",
     newArchEnabled: true,
     icon: icon,
     scheme: scheme,

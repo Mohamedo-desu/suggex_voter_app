@@ -42,6 +42,16 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="search"
+        options={{
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+          title: "Search Suggestions Or Groups",
+          headerTitleAlign: "center",
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           tabBarIcon: ({ size, color }) => (
