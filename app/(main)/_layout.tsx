@@ -45,11 +45,10 @@ const MainLayout = () => {
       <Stack.Screen
         name="groupDetails"
         options={{
-          title: "",
+          title: "Group Details",
           headerTitleAlign: "center",
           headerRight: (props) => (
             <TouchableOpacity
-              style={{ marginRight: 15 }}
               activeOpacity={0.8}
               hitSlop={10}
               onPress={() => undefined}

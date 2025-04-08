@@ -176,7 +176,7 @@ const CreateScreen = () => {
                     handleChange={handleChange("suggestionDescription")}
                     onBlur={handleBlur("suggestionDescription")}
                     multiline
-                    style={[{ height: 150 }, styles.textArea]}
+                    style={[styles.textArea]}
                     textAlignVertical="top"
                     maxLength={300}
                     errors={errors.suggestionDescription}
@@ -275,7 +275,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
   },
-  textArea: {},
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
   pickerContainer: {
     overflow: "hidden",
     backgroundColor: Colors.cardBackground,

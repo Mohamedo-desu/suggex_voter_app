@@ -79,16 +79,10 @@ export const fetchUserGroups = query({
 export const addGroup = mutation({
   args: {
     groupName: v.string(),
-    status: v.union(
-      v.literal("open"),
-      v.literal("rejected"),
-      v.literal("approved"),
-      v.literal("closed")
-    ),
+    status: v.union(v.literal("open"), v.literal("closed")),
   },
   handler: async (ctx, args) => {
     const { db } = ctx;
-
     const currentUser = await getAuthenticatedUser(ctx);
     const userId = currentUser._id;
 
@@ -184,7 +178,6 @@ export const fetchGroupDetails = query({
     const currentUser = await getAuthenticatedUser(ctx);
 
     const group = await db.get(groupId);
-
     if (!group) throw new Error("Group not found");
 
     const approvedCount = (
@@ -219,16 +212,109 @@ export const fetchSuggestions = query({
   },
   handler: async (ctx, { groupId }) => {
     const { db } = ctx;
-
     const group = await db.get(groupId);
-
     if (!group) throw new Error("Group not found");
 
     const suggestions = await db
       .query("suggestions")
       .withIndex("by_group", (q) => q.eq("groupId", groupId))
       .collect();
-
     return suggestions;
+  },
+});
+
+// ---------------------------------------------------------------------
+// Updated Delete Mutation: Cascade Deletion of Related Records
+// ---------------------------------------------------------------------
+export const deleteGroup = mutation({
+  args: {
+    groupId: v.id("groups"),
+  },
+  handler: async (ctx, { groupId }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    // Fetch the group to ensure it exists.
+    const group = await db.get(groupId);
+    if (!group) {
+      throw new Error("Group not found");
+    }
+
+    // Only the group owner is allowed to delete the group.
+    if (group.userId !== currentUser._id) {
+      throw new Error("Only the group owner can delete the group.");
+    }
+
+    // Delete all suggestions in the group and their related records.
+    const suggestions = await db
+      .query("suggestions")
+      .withIndex("by_group", (q) => q.eq("groupId", groupId))
+      .collect();
+
+    for (const suggestion of suggestions) {
+      const suggestionId = suggestion._id;
+
+      // Delete comments for this suggestion.
+      const comments = await db
+        .query("comments")
+        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+        .collect();
+      for (const comment of comments) {
+        await db.delete(comment._id);
+      }
+
+      // Delete suggestion invitations.
+      const suggestionInvitations = await db
+        .query("suggestionInvitations")
+        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+        .collect();
+      for (const invitation of suggestionInvitations) {
+        await db.delete(invitation._id);
+      }
+
+      // Delete bookmarks.
+      const bookmarks = await db
+        .query("bookmarks")
+        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+        .collect();
+      for (const bookmark of bookmarks) {
+        await db.delete(bookmark._id);
+      }
+
+      // Delete likes.
+      const likes = await db
+        .query("likes")
+        .withIndex("by_post", (q) => q.eq("suggestionId", suggestionId))
+        .collect();
+      for (const like of likes) {
+        await db.delete(like._id);
+      }
+
+      // Delete notifications related to this suggestion.
+      const notifications = await db
+        .query("notifications")
+        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+        .collect();
+      for (const notification of notifications) {
+        await db.delete(notification._id);
+      }
+
+      // Delete the suggestion itself.
+      await db.delete(suggestionId);
+    }
+
+    // Delete group invitations.
+    const groupInvitations = await db
+      .query("groupInvitations")
+      .withIndex("by_group", (q) => q.eq("groupId", groupId))
+      .collect();
+    for (const invitation of groupInvitations) {
+      await db.delete(invitation._id);
+    }
+
+    // Delete the group.
+    await db.delete(groupId);
+
+    return true;
   },
 });

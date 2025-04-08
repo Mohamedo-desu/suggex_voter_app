@@ -76,6 +76,13 @@ export default defineSchema({
   })
     .index("by_suggestion", ["suggestionId"])
     .index("by_user", ["userId"]),
+  likes: defineTable({
+    userId: v.id("users"),
+    suggestionId: v.id("suggestions"),
+  })
+    .index("by_post", ["suggestionId"])
+    .index("by_user_and_suggestion", ["userId", "suggestionId"]),
+
   bookmarks: defineTable({
     userId: v.id("users"),
     suggestionId: v.id("suggestions"),
