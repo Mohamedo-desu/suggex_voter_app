@@ -59,6 +59,23 @@ const MainLayout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="suggestionDetails"
+        options={{
+          title: "Suggestion Details",
+          headerTitleAlign: "center",
+          headerRight: (props) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              hitSlop={10}
+              onPress={() => undefined}
+              {...props}
+            >
+              <Ionicons name="share-outline" size={25} color={Colors.primary} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 };

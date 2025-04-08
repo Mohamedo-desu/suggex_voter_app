@@ -65,7 +65,7 @@ const GroupDetails: FC = () => {
 
   // Render each suggestion item.
   const renderItem = ({ item }: { item: SuggestionItem }) => (
-    <Suggestion item={item} />
+    <Suggestion item={item} userId={user?.id} />
   );
 
   // List header component shows group details.
@@ -73,7 +73,6 @@ const GroupDetails: FC = () => {
     if (!groupDetails) return null;
 
     const {
-      userId,
       groupName,
       role,
       status,
@@ -196,6 +195,7 @@ const GroupDetails: FC = () => {
       ListHeaderComponent={ListHeaderComponent}
       ListEmptyComponent={<Empty text="No suggestions found" />}
       contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
     />
   );
 };
@@ -220,8 +220,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   leftHeader: {
-    flexDirection: "row",
-    alignItems: "center",
     flex: 1,
   },
   groupNameText: {

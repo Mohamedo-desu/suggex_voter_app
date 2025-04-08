@@ -3,10 +3,6 @@ import { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { getAuthenticatedUser } from "./user";
 
-type GroupWithRole = Doc<"groups"> & {
-  role: "owner" | "invited";
-};
-
 export const fetchUserGroups = query({
   handler: async (ctx) => {
     const { db } = ctx;
@@ -223,9 +219,6 @@ export const fetchSuggestions = query({
   },
 });
 
-// ---------------------------------------------------------------------
-// Updated Delete Mutation: Cascade Deletion of Related Records
-// ---------------------------------------------------------------------
 export const deleteGroup = mutation({
   args: {
     groupId: v.id("groups"),
@@ -316,5 +309,128 @@ export const deleteGroup = mutation({
     await db.delete(groupId);
 
     return true;
+  },
+});
+
+export const updateSuggestion = mutation({
+  args: {
+    suggestionId: v.id("suggestions"),
+    suggestionTitle: v.optional(v.string()),
+    suggestionDescription: v.optional(v.string()),
+    endGoal: v.optional(v.number()),
+    status: v.optional(v.string()),
+  },
+  handler: async (
+    ctx,
+    { suggestionId, suggestionTitle, suggestionDescription, endGoal, status }
+  ) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const suggestion = await db.get(suggestionId);
+    if (!suggestion) {
+      throw new Error("Suggestion not found");
+    }
+
+    // Only the suggestion owner can update the suggestion.
+    if (suggestion.userId !== currentUser._id) {
+      throw new Error("Only the suggestion owner can update this suggestion.");
+    }
+
+    const updateFields: Record<string, unknown> = {};
+    if (suggestionTitle !== undefined) updateFields.title = suggestionTitle;
+    if (suggestionDescription !== undefined)
+      updateFields.description = suggestionDescription;
+    if (endGoal !== undefined) updateFields.endGoal = endGoal;
+    if (status !== undefined) updateFields.status = status;
+
+    await db.patch(suggestionId, updateFields);
+    return true;
+  },
+});
+
+export const deleteSuggestion = mutation({
+  args: {
+    suggestionId: v.id("suggestions"),
+  },
+  handler: async (ctx, { suggestionId }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const suggestion = await db.get(suggestionId);
+    if (!suggestion) {
+      throw new Error("Suggestion not found");
+    }
+
+    // Only the suggestion owner can delete the suggestion.
+    if (suggestion.userId !== currentUser._id) {
+      throw new Error("Only the suggestion owner can delete this suggestion.");
+    }
+
+    // Cascade deletion for related records.
+
+    // Delete all comments related to this suggestion.
+    const comments = await db
+      .query("comments")
+      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+      .collect();
+    for (const comment of comments) {
+      await db.delete(comment._id);
+    }
+
+    // Delete any suggestion invitations.
+    const suggestionInvitations = await db
+      .query("suggestionInvitations")
+      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+      .collect();
+    for (const invitation of suggestionInvitations) {
+      await db.delete(invitation._id);
+    }
+
+    // Delete bookmarks associated with this suggestion.
+    const bookmarks = await db
+      .query("bookmarks")
+      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+      .collect();
+    for (const bookmark of bookmarks) {
+      await db.delete(bookmark._id);
+    }
+
+    // Delete likes associated with this suggestion.
+    const likes = await db
+      .query("likes")
+      .withIndex("by_post", (q) => q.eq("suggestionId", suggestionId))
+      .collect();
+    for (const like of likes) {
+      await db.delete(like._id);
+    }
+
+    // Delete notifications related to this suggestion.
+    const notifications = await db
+      .query("notifications")
+      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
+      .collect();
+    for (const notification of notifications) {
+      await db.delete(notification._id);
+    }
+
+    // Finally, delete the suggestion itself.
+    await db.delete(suggestionId);
+
+    return true;
+  },
+});
+
+export const fetchSuggestionDetails = query({
+  args: {
+    suggestionId: v.id("suggestions"),
+  },
+  handler: async (ctx, { suggestionId }) => {
+    const { db } = ctx;
+    const suggestion = await db.get(suggestionId);
+    if (!suggestion) {
+      throw new Error("Suggestion not found");
+    }
+    return suggestion;
   },
 });
