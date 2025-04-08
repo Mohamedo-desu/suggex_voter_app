@@ -1,7 +1,7 @@
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { SuggestionItemProps } from "@/types";
 import {
   FontAwesome5,
   Ionicons,
@@ -13,7 +13,6 @@ import { router } from "expo-router";
 import React, { FC, useCallback, useEffect, useMemo } from "react";
 import {
   Alert,
-  GestureResponderEvent,
   StyleSheet,
   Text,
   TextStyle,
@@ -27,29 +26,14 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-interface SuggestionItem {
-  _id: Id<"suggestions">;
-  title: string;
-  description: string;
-  _creationTime: number | Date;
-  likesCount: number;
-  commentsCount: number;
-  userId: string;
-  status: "approved" | "rejected" | "closed" | string;
-  endGoal: number;
-}
-
-interface SuggestionProps {
-  item: SuggestionItem;
-  userId: string;
-}
-
-const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
+const Suggestion: FC<{ item: SuggestionItemProps; userId: string }> = ({
+  item,
+  userId,
+}) => {
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
 
   const isPrivate: boolean = item.status === "private";
 
-  // Memoize formatted creation time
   const creationTimeFormatted = useMemo(
     () =>
       formatDistanceToNowStrict(new Date(item._creationTime), {
@@ -65,32 +49,27 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
   const isOwner = currentUser?._id === item.userId;
   const isClosed = item.status === "closed";
 
-  // Delete handler using useCallback to prevent unnecessary re-renders
-  const handleDelete = useCallback(
-    (event: GestureResponderEvent) => {
-      if (isClosed) return;
-      Alert.alert(
-        "Delete Suggestion",
-        "Are you sure you want to delete this suggestion? This action cannot be undone.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                // Call your delete mutation here.
-                await deleteSuggestion({ suggestionId: item._id });
-              } catch (error) {
-                console.error("Failed to delete suggestion:", error);
-              }
-            },
+  const handleDelete = useCallback(() => {
+    if (isClosed) return;
+    Alert.alert(
+      "Delete Suggestion",
+      "Are you sure you want to delete this suggestion? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteSuggestion({ suggestionId: item._id });
+            } catch (error) {
+              console.error("Failed to delete suggestion:", error);
+            }
           },
-        ]
-      );
-    },
-    [isClosed, item._id]
-  );
+        },
+      ]
+    );
+  }, [isClosed, item._id]);
 
   const displayName: string = useMemo(() => {
     return item.title.length > 25
@@ -98,7 +77,6 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
       : item.title;
   }, [item.title]);
 
-  // Memoize container style
   const containerStyle = useMemo(
     () => [
       styles.container,
@@ -110,14 +88,12 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
     [item.status, isClosed, isPrivate]
   );
 
-  // Memoize progress calculation
   const progress = useMemo(
     () =>
       item.endGoal > 0 ? Math.min(item.likesCount / item.endGoal, 1) * 100 : 0,
     [item.endGoal, item.likesCount]
   );
 
-  // Reanimated shared value for progress animation
   const progressShared = useSharedValue(0);
 
   useEffect(() => {
@@ -200,7 +176,7 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
           ))}
         </View>
       </View>
-      {/* Progress bar */}
+
       {isOwner && (
         <View style={styles.progressWrapper}>
           <View style={styles.progressBarContainer}>
@@ -215,14 +191,12 @@ const Suggestion: FC<SuggestionProps> = ({ item, userId }) => {
   );
 };
 
-Suggestion.displayName = "Suggestion";
-
 export default Suggestion;
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
-    borderRadius: 10,
+    borderRadius: 5,
     elevation: 2,
     padding: 15,
   },
