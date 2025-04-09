@@ -34,18 +34,18 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   );
 
   // Compare current user with suggestion owner.
-  const isOwner = currentUser?._id === item.userId;
-  const isClosed = item.status === "closed";
+  const isOwner = currentUser?._id === item?.userId;
+  const isClosed = item?.status === "closed";
 
   // Memoize creation time formatting.
   const creationTimeFormatted = useMemo(() => {
-    return formatDistanceToNowStrict(new Date(item._creationTime), {
+    return formatDistanceToNowStrict(new Date(item?._creationTime), {
       addSuffix: true,
     });
-  }, [item._creationTime]);
+  }, [item?._creationTime]);
 
   const handleEdit = () => {
-    console.log("Edit suggestion", item._id);
+    console.log("Edit suggestion", item?._id);
     // TODO: implement update suggestion mutation.
   };
 
@@ -61,7 +61,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
           onPress: async () => {
             try {
               // TODO: call deleteSuggestion mutation.
-              await deleteSuggestion({ suggestionId: item._id });
+              await deleteSuggestion({ suggestionId: item?._id });
               router.back();
             } catch (error) {
               console.error("Failed to delete suggestion:", error);
@@ -75,8 +75,10 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   // Calculate progress relative to the endGoal.
   const progress = useMemo(
     () =>
-      item.endGoal > 0 ? Math.min(item.likesCount / item.endGoal, 1) * 100 : 0,
-    [item.endGoal, item.likesCount]
+      item?.endGoal > 0
+        ? Math.min(item?.likesCount / item?.endGoal, 1) * 100
+        : 0,
+    [item?.endGoal, item?.likesCount]
   );
 
   // Set up Reanimated shared value for the progress animation.
@@ -93,7 +95,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-          {item.title}
+          {item?.title}
         </Text>
         {isOwner && (
           <View style={styles.actionButtons}>
@@ -115,15 +117,15 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
         )}
       </View>
 
-      <Text style={styles.description}>{item.description}</Text>
+      <Text style={styles.description}>{item?.description}</Text>
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>Created: </Text>
         <Text style={styles.detailValue}>{creationTimeFormatted}</Text>
       </View>
       <View style={styles.statsContainer}>
         {[
-          { label: "upvotes", count: item.likesCount },
-          { label: "comments", count: item.commentsCount },
+          { label: "upvotes", count: item?.likesCount },
+          { label: "comments", count: item?.commentsCount },
         ].map(({ label, count }) => (
           <View key={label} style={styles.statItem}>
             <Text style={styles.statLabel}>{label}:</Text>

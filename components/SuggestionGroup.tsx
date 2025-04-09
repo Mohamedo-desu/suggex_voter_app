@@ -35,7 +35,7 @@ const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
     rejectedCount,
     role,
     status,
-  } = item;
+  } = item || {};
 
   const groupActive: boolean = status === "open";
   const isPrivate: boolean = status === "private";

@@ -74,7 +74,9 @@ const GroupDetails: FC = () => {
 
   // Navigate back automatically if the group is inactive.
   useEffect(() => {
-    if (!groupDetails) return;
+    if (!groupDetails) {
+      return;
+    }
 
     if (
       groupDetails.status !== "open" &&
@@ -83,6 +85,13 @@ const GroupDetails: FC = () => {
       router.back();
     }
   }, [groupDetails, router, user]);
+
+  useEffect(() => {
+    // Check for deleted (or non-existent) group.
+    if (groupDetails !== undefined && !groupDetails) {
+      router.back();
+    }
+  }, [groupDetails, router]);
 
   if (suggestions === undefined) return <Loader />;
 

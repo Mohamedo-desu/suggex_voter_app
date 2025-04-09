@@ -158,7 +158,7 @@ export const fetchGroupDetails = query({
     const currentUser = await getAuthenticatedUser(ctx);
 
     const group = await db.get(groupId);
-    if (!group) throw new Error("Group not found");
+    if (!group) return null;
 
     const approvedCount = (
       await db
@@ -195,7 +195,7 @@ export const fetchSuggestions = query({
     const currentUser = await getAuthenticatedUser(ctx);
 
     const group = await db.get(groupId);
-    if (!group) throw new Error("Group not found");
+    if (!group) return [];
 
     let suggestions;
 
@@ -204,7 +204,6 @@ export const fetchSuggestions = query({
         .query("suggestions")
         .withIndex("by_group", (q) => q.eq("groupId", groupId))
         .collect();
-
       return suggestions;
     }
 
@@ -233,7 +232,6 @@ export const fetchSuggestions = query({
       suggestions = await Promise.all(
         invitedSuggestionIds.map(async (suggestionId) => {
           const suggestion = await db.get(suggestionId);
-          // Ensure the suggestion belongs to the group.
           if (suggestion && suggestion.groupId === groupId) {
             return suggestion;
           }
@@ -476,7 +474,6 @@ export const searchGroupsByInvitationCode = mutation({
   args: { invitationCode: v.string() },
   handler: async (ctx, { invitationCode }) => {
     const { db } = ctx;
-
     const currentUser = await getAuthenticatedUser(ctx);
 
     const group = await db
@@ -486,7 +483,7 @@ export const searchGroupsByInvitationCode = mutation({
       )
       .first();
 
-    if (!group) throw new Error("Group not found");
+    if (!group) return null; // Return null instead of throwing an error
 
     const isOwner = group.userId === currentUser._id;
 
@@ -586,14 +583,12 @@ export const requestToJoinGroup = mutation({
         q.eq("invitationCode", invitationCode)
       )
       .first();
-    if (!group) throw new Error("Group not found");
+    if (!group) return null; // Return null if group not found
 
-    // Prevent owner from joining their own group.
     if (group.userId === currentUser._id) {
       throw new Error("Owner cannot request to join their own group");
     }
 
-    // Check if a request (or invitation) already exists
     const existingRequest = await db
       .query("groupInvitations")
       .withIndex("by_both", (q) =>
@@ -602,7 +597,7 @@ export const requestToJoinGroup = mutation({
       .first();
 
     if (existingRequest) {
-      db.patch(existingRequest._id, {
+      await db.patch(existingRequest._id, {
         allSuggestions: true,
       });
       return;
@@ -616,6 +611,7 @@ export const requestToJoinGroup = mutation({
     return invitationId;
   },
 });
+
 export const requestToJoinSuggestion = mutation({
   args: {
     invitationCode: v.string(),

@@ -7,12 +7,21 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { router } from "expo-router";
-import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 
 const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
   if (!groupDetails) return null;
+
+  const [deleting, setDeleting] = useState(false);
 
   const deleteGroup = useMutation(api.suggestion.deleteGroup);
 
@@ -24,7 +33,7 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
     suggestionsCount,
     approvedCount,
     rejectedCount,
-  } = groupDetails;
+  } = groupDetails || {};
 
   const isActive = status === "open";
   const creationTimeFormatted = formatDistanceToNowStrict(
@@ -38,6 +47,9 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
   // Delete handler called when the trash icon is pressed.
   const handleDeleteGroup = async () => {
     try {
+      if (deleting) return;
+
+      setDeleting(true);
       Alert.alert(
         "Delete Group",
         "Are you sure you want to delete this group?\nThis action cannot be undone.",
@@ -58,6 +70,8 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
       );
     } catch (error) {
       console.error("Failed to delete group", error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -74,12 +88,17 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
               >
                 <FontAwesome5 name="edit" size={20} color={Colors.primary} />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleDeleteGroup}
-                style={styles.deleteButton}
-              >
-                <FontAwesome5 name="trash" size={20} color={Colors.error} />
-              </TouchableOpacity>
+
+              {deleting ? (
+                <ActivityIndicator size={"small"} color={Colors.error} />
+              ) : (
+                <TouchableOpacity
+                  onPress={handleDeleteGroup}
+                  style={styles.deleteButton}
+                >
+                  <FontAwesome5 name="trash" size={20} color={Colors.error} />
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>

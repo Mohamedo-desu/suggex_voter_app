@@ -8,13 +8,21 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { CommentProps, SuggestionProps } from "@/types";
 import { useUser } from "@clerk/clerk-expo";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { FC, useEffect } from "react";
-import { FlatList, StyleSheet, Text } from "react-native";
+import React, { FC, useEffect, useState } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SuggestionDetails: FC = () => {
   const { suggestionId } = useLocalSearchParams();
+  const [newComment, setNewComment] = useState("");
 
   const suggestionDetails = useQuery(api.suggestion.fetchSuggestionDetails, {
     suggestionId: suggestionId as Id<"suggestions">,
@@ -24,6 +32,8 @@ const SuggestionDetails: FC = () => {
     suggestionId: suggestionId as Id<"suggestions">,
   }) as CommentProps[];
 
+  const addComment = useMutation(api.comment.addComment);
+
   const { user } = useUser();
 
   useEffect(() => {
@@ -31,6 +41,23 @@ const SuggestionDetails: FC = () => {
       router.back();
     }
   }, [suggestionDetails]);
+
+  console.log({ comments });
+
+  const handleAddComment = async () => {
+    try {
+      if (!newComment.trim() || !suggestionId) {
+        return;
+      }
+      await addComment({
+        content: newComment,
+        suggestionId: suggestionId as Id<"suggestions">,
+      });
+      setNewComment("");
+    } catch (error) {
+      console.log("Error adding comment", error);
+    }
+  };
 
   if (suggestionDetails === undefined) return <Loader />;
 
@@ -41,7 +68,52 @@ const SuggestionDetails: FC = () => {
   return (
     <>
       <SuggestionDetailsCard item={suggestionDetails} userId={user?.id} />
-
+      <View
+        style={{
+          backgroundColor: Colors.background,
+          elevation: 2,
+          marginTop: 5,
+          padding: 10,
+          zIndex: 10,
+          gap: 10,
+        }}
+      >
+        <TextInput
+          style={{
+            color: Colors.textDark,
+            fontSize: 14,
+            fontFamily: Fonts.Regular,
+            paddingVertical: 10,
+          }}
+          textAlignVertical="top"
+          placeholder="Add a comment..."
+          placeholderTextColor={Colors.textDark}
+          value={newComment}
+          onChangeText={setNewComment}
+          multiline
+          maxLength={300}
+        />
+        <TouchableOpacity
+          onPress={handleAddComment}
+          disabled={!newComment.trim()}
+          style={{
+            backgroundColor: Colors.primary,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 10,
+            borderRadius: 5,
+          }}
+        >
+          <Text
+            style={[
+              { color: Colors.white, fontSize: 16 },
+              !newComment.trim() && {},
+            ]}
+          >
+            Post
+          </Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={comments}
         keyExtractor={(item) => item._id}
@@ -49,7 +121,11 @@ const SuggestionDetails: FC = () => {
         ListEmptyComponent={<Empty text="No comments found" />}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={<Text style={styles.resultHeader}>Comments</Text>}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.resultHeader}>Comments</Text>
+          </>
+        }
       />
     </>
   );
@@ -60,6 +136,8 @@ export default SuggestionDetails;
 const styles = StyleSheet.create({
   contentContainer: {
     padding: 15,
+    gap: 10,
+    paddingBottom: 25,
   },
   resultHeader: {
     fontSize: 16,

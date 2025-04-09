@@ -10,8 +10,9 @@ import {
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { router } from "expo-router";
-import React, { FC, useCallback, useEffect, useMemo } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   StyleSheet,
   Text,
@@ -30,27 +31,30 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   item,
   userId,
 }) => {
+  const [deleting, setDeleting] = useState(false);
+
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
 
-  const isPrivate: boolean = item.status === "private";
+  const isPrivate: boolean = item?.status === "private";
 
   const creationTimeFormatted = useMemo(
     () =>
-      formatDistanceToNowStrict(new Date(item._creationTime), {
+      formatDistanceToNowStrict(new Date(item?._creationTime), {
         addSuffix: true,
       }),
-    [item._creationTime]
+    [item?._creationTime]
   );
 
   const currentUser = useQuery(
     api.user.getUserByClerkId,
     userId ? { clerkId: userId } : "skip"
   );
-  const isOwner = currentUser?._id === item.userId;
-  const isClosed = item.status === "closed";
+  const isOwner = currentUser?._id === item?.userId;
+  const isClosed = item?.status === "closed";
 
   const handleDelete = useCallback(() => {
-    if (isClosed) return;
+    if (isClosed || deleting) return;
+
     Alert.alert(
       "Delete Suggestion",
       "Are you sure you want to delete this suggestion? This action cannot be undone.",
@@ -61,37 +65,42 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteSuggestion({ suggestionId: item._id });
+              setDeleting(true);
+              await deleteSuggestion({ suggestionId: item?._id });
             } catch (error) {
               console.error("Failed to delete suggestion:", error);
+            } finally {
+              setDeleting(false);
             }
           },
         },
       ]
     );
-  }, [isClosed, item._id]);
+  }, [isClosed, item?._id]);
 
   const displayName: string = useMemo(() => {
-    return item.title.length > 25
-      ? item.title.slice(0, 25) + "..."
-      : item.title;
-  }, [item.title]);
+    return item?.title.length > 25
+      ? item?.title.slice(0, 25) + "..."
+      : item?.title;
+  }, [item?.title]);
 
   const containerStyle = useMemo(
     () => [
       styles.container,
-      item.status === "rejected" && styles.rejected,
-      item.status === "approved" && styles.approved,
+      item?.status === "rejected" && styles.rejected,
+      item?.status === "approved" && styles.approved,
       isClosed && styles.closed,
       isPrivate && styles.private,
     ],
-    [item.status, isClosed, isPrivate]
+    [item?.status, isClosed, isPrivate]
   );
 
   const progress = useMemo(
     () =>
-      item.endGoal > 0 ? Math.min(item.likesCount / item.endGoal, 1) * 100 : 0,
-    [item.endGoal, item.likesCount]
+      item?.endGoal > 0
+        ? Math.min(item?.likesCount / item?.endGoal, 1) * 100
+        : 0,
+    [item?.endGoal, item?.likesCount]
   );
 
   const progressShared = useSharedValue(0);
@@ -112,7 +121,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
       onPress={() =>
         router.navigate({
           pathname: "/(main)/suggestionDetails",
-          params: { suggestionId: item._id },
+          params: { suggestionId: item?._id },
         })
       }
     >
@@ -128,7 +137,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
           {displayName}
         </Text>
         <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
-          {item.description}
+          {item?.description}
         </Text>
         {isOwner && (
           <View style={styles.actionButtons}>
@@ -139,13 +148,17 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
             >
               <FontAwesome5 name="edit" size={15} color={Colors.primary} />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.deleteButton}
-              disabled={isClosed}
-            >
-              <FontAwesome5 name="trash" size={15} color={Colors.error} />
-            </TouchableOpacity>
+            {deleting ? (
+              <ActivityIndicator size={"small"} color={Colors.error} />
+            ) : (
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.deleteButton}
+                disabled={isClosed}
+              >
+                <FontAwesome5 name="trash" size={15} color={Colors.error} />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
@@ -153,8 +166,8 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
         <Text style={styles.infoText}>{creationTimeFormatted}</Text>
         <View style={styles.statsContainer}>
           {[
-            { label: "upvotes", count: item.likesCount },
-            { label: "comments", count: item.commentsCount },
+            { label: "upvotes", count: item?.likesCount },
+            { label: "comments", count: item?.commentsCount },
           ].map(({ label, count }) => (
             <View key={label} style={styles.statItemContainer}>
               <Text style={styles.statLabel}>{label} : </Text>
