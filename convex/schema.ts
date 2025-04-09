@@ -4,13 +4,8 @@ import { v } from "convex/values";
 export default defineSchema({
   // Users table: stores user details and basic statistics.
   users: defineTable({
-    username: v.string(),
-    fullname: v.string(),
     email: v.string(),
-    image: v.string(),
     clerkId: v.string(),
-    suggestionsCount: v.number(),
-    commentsCount: v.number(),
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_email", ["email"]),
@@ -83,21 +78,4 @@ export default defineSchema({
   })
     .index("by_post", ["suggestionId"])
     .index("by_user_and_suggestion", ["userId", "suggestionId"]),
-
-  bookmarks: defineTable({
-    userId: v.id("users"),
-    suggestionId: v.id("suggestions"),
-  })
-    .index("by_user", ["userId"])
-    .index("by_suggestion", ["suggestionId"])
-    .index("by_both", ["userId", "suggestionId"]),
-  notifications: defineTable({
-    receiverId: v.id("users"),
-    senderId: v.id("users"),
-    type: v.union(v.literal("like"), v.literal("comment"), v.literal("closed")),
-    suggestionId: v.optional(v.id("suggestions")),
-    commentId: v.optional(v.id("comments")),
-  })
-    .index("by_receiver", ["receiverId"])
-    .index("by_suggestion", ["suggestionId"]),
 });

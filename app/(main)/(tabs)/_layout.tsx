@@ -6,6 +6,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 const TabsLayout = () => {
   const router = useRouter();
+
   return (
     <Tabs
       screenOptions={{

@@ -7,7 +7,9 @@
     "publish:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
     "upgrade": "bun install expo@latest && bunx expo install --fix",
     "android": "bunx expo run:android --device",
+    "build:web": "npx expo export --platform web",
     "release:android": "bunx expo run:android --device --variant Release",
+    "release:web": "eas deploy --prod",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "ios": "expo run:ios"
@@ -42,6 +44,7 @@
     "react-dom": "18.3.1",
     "react-native": "0.76.9",
     "react-native-animated-numbers": "^0.6.3",
+    "react-native-awesome-alerts": "^2.0.0",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-reanimated": "~3.16.1",
     "react-native-responsive-fontsize": "^0.5.1",
@@ -69,5 +72,22 @@
     "browser-tabs-lock",
     "core-js",
     "esbuild"
-  ]
+  ],
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "enabled": true,
+        "exclude": [
+          "@babel/plugin-proposal-export-namespace-from",
+          "convex",
+          "nanoid",
+          "svix",
+          "yup",
+          "react-native-awesome-alerts",
+          "react-native-responsive-fontsize"
+        ],
+        "listUnknownPackages": true
+      }
+    }
+  }
 }

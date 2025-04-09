@@ -5,22 +5,21 @@ const PROJECT_SLUG = "suggex";
 const OWNER = "mohamedo-desu";
 
 // App production config
-const APP_NAME = "Suggex-Voter";
+const APP_NAME = "Suggestion Box";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
-const ICON = "./assets/icons/ios-prod.png";
-const ADAPTIVE_ICON = "./assets/icons/android-prod.png";
+const ICON = "./assets/icons/icon.png";
+const ADAPTIVE_ICON = "./assets/icons/adaptive-icon.png";
 const SCHEME = PROJECT_SLUG;
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   console.log("⚙️ Building app for environment:", process.env.APP_ENV);
-  const { name, bundleIdentifier, icon, adaptiveIcon, packageName, scheme } =
-    getDynamicAppConfig(
-      (process.env.EXPO_PUBLIC_APP_ENV as
-        | "development"
-        | "preview"
-        | "production") || "preview"
-    );
+  const { name, icon, adaptiveIcon, packageName, scheme } = getDynamicAppConfig(
+    (process.env.EXPO_PUBLIC_APP_ENV as
+      | "development"
+      | "preview"
+      | "production") || "preview"
+  );
 
   return {
     ...config,
@@ -53,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png",
+      favicon: "./assets/icons/splash-icon.png",
     },
     plugins: [
       "expo-router",
@@ -61,7 +60,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-splash-screen",
         {
           image: "./assets/icons/splash-icon.png",
-          imageWidth: 200,
+          imageWidth: 150,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
           dark: {
@@ -114,8 +113,8 @@ export const getDynamicAppConfig = (
       name: `${APP_NAME} Preview`,
       bundleIdentifier: `${BUNDLE_IDENTIFIER}.preview`,
       packageName: `${PACKAGE_NAME}.preview`,
-      icon: "./assets/icons/ios-prev.png",
-      adaptiveIcon: "./assets/icons/android-prev.png",
+      icon: "./assets/icons/icon.png",
+      adaptiveIcon: "./assets/icons/adaptive-icon.png",
       scheme: `${SCHEME}-prev`,
     };
   }
@@ -124,8 +123,8 @@ export const getDynamicAppConfig = (
     name: `${APP_NAME} Development`,
     bundleIdentifier: `${BUNDLE_IDENTIFIER}.dev`,
     packageName: `${PACKAGE_NAME}.dev`,
-    icon: "./assets/icons/ios-dev.png",
-    adaptiveIcon: "./assets/icons/android-dev.png",
+    icon: "./assets/icons/icon.png",
+    adaptiveIcon: "./assets/icons/adaptive-icon.png",
     scheme: `${SCHEME}-dev`,
   };
 };

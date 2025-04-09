@@ -12,6 +12,7 @@ import { useMutation, useQuery } from "convex/react";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { FC, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -23,6 +24,7 @@ import {
 const SuggestionDetails: FC = () => {
   const { suggestionId } = useLocalSearchParams();
   const [newComment, setNewComment] = useState("");
+  const [addingComment, setAddingComment] = useState(false);
 
   const suggestionDetails = useQuery(api.suggestion.fetchSuggestionDetails, {
     suggestionId: suggestionId as Id<"suggestions">,
@@ -44,9 +46,10 @@ const SuggestionDetails: FC = () => {
 
   const handleAddComment = async () => {
     try {
-      if (!newComment.trim() || !suggestionId) {
+      if (!newComment.trim() || !suggestionId || addingComment) {
         return;
       }
+      setAddingComment(true);
       await addComment({
         content: newComment,
         suggestionId: suggestionId as Id<"suggestions">,
@@ -54,6 +57,8 @@ const SuggestionDetails: FC = () => {
       setNewComment("");
     } catch (error) {
       console.log("Error adding comment", error);
+    } finally {
+      setAddingComment(false);
     }
   };
 
@@ -93,7 +98,7 @@ const SuggestionDetails: FC = () => {
         />
         <TouchableOpacity
           onPress={handleAddComment}
-          disabled={!newComment.trim()}
+          disabled={!newComment.trim() || addingComment}
           style={{
             backgroundColor: Colors.primary,
             justifyContent: "center",
@@ -101,15 +106,20 @@ const SuggestionDetails: FC = () => {
             padding: 10,
             borderRadius: 5,
           }}
+          activeOpacity={0.8}
         >
-          <Text
-            style={[
-              { color: Colors.white, fontSize: 16 },
-              !newComment.trim() && {},
-            ]}
-          >
-            Post
-          </Text>
+          {addingComment ? (
+            <ActivityIndicator size={"small"} color={Colors.white} />
+          ) : (
+            <Text
+              style={[
+                { color: Colors.white, fontSize: 16 },
+                !newComment.trim() && {},
+              ]}
+            >
+              Post
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
       <FlatList

@@ -43,16 +43,6 @@ export const addComment = mutation({
       commentsCount: suggestion.commentsCount + 1,
     });
 
-    if (currentUser._id !== suggestion.userId) {
-      await db.insert("notifications", {
-        receiverId: suggestion.userId,
-        senderId: currentUser._id,
-        type: "comment",
-        commentId,
-        suggestionId,
-      });
-    }
-
     return commentId;
   },
 });

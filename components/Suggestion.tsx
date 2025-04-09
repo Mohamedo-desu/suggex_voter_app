@@ -10,10 +10,9 @@ import {
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { router } from "expo-router";
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TextStyle,
@@ -21,6 +20,7 @@ import {
   View,
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
+import AwesomeAlert from "react-native-awesome-alerts";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -31,6 +31,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   item,
   userId,
 }) => {
+  const [showAlert, setShowAlert] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
@@ -52,31 +53,21 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   const isOwner = currentUser?._id === item?.userId;
   const isClosed = item?.status === "closed";
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = async () => {
     if (isClosed || deleting) return;
 
-    Alert.alert(
-      "Delete Suggestion",
-      "Are you sure you want to delete this suggestion? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setDeleting(true);
-              await deleteSuggestion({ suggestionId: item?._id });
-            } catch (error) {
-              console.error("Failed to delete suggestion:", error);
-            } finally {
-              setDeleting(false);
-            }
-          },
-        },
-      ]
-    );
-  }, [isClosed, item?._id]);
+    setDeleting(true);
+    setShowAlert(false);
+
+    try {
+      setDeleting(true);
+      await deleteSuggestion({ suggestionId: item?._id });
+    } catch (error) {
+      console.error("Failed to delete suggestion:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const displayName: string = useMemo(() => {
     return item?.title.length > 25
@@ -141,18 +132,11 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
         </Text>
         {isOwner && (
           <View style={styles.actionButtons}>
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.editButton}
-              disabled={isClosed}
-            >
-              <FontAwesome5 name="edit" size={15} color={Colors.primary} />
-            </TouchableOpacity>
             {deleting ? (
               <ActivityIndicator size={"small"} color={Colors.error} />
             ) : (
               <TouchableOpacity
-                onPress={handleDelete}
+                onPress={() => setShowAlert(true)}
                 style={styles.deleteButton}
                 disabled={isClosed}
               >
@@ -200,6 +184,21 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
           <Text style={styles.progressText}>{Math.round(progress)}%</Text>
         </View>
       )}
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Delete"
+        message="Are you sure you want to delete this suggestion? This action cannot be undone"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No, cancel"
+        confirmText="Yes, delete"
+        confirmButtonColor={Colors.error}
+        onCancelPressed={() => setShowAlert(false)}
+        onConfirmPressed={() => handleDelete()}
+      />
     </TouchableOpacity>
   );
 };

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 const Comment = ({ item, userId }) => {
   const currentUser = useQuery(
@@ -21,6 +22,7 @@ const Comment = ({ item, userId }) => {
   const isOwner = currentUser?._id === item.userId;
 
   const [deleting, setDeleting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const deleteComment = useMutation(api.comment.deleteComment);
   const handleDelete = async () => {
@@ -28,6 +30,8 @@ const Comment = ({ item, userId }) => {
       if (deleting) return;
 
       setDeleting(true);
+      setShowAlert(false);
+
       await deleteComment({ commentId: item._id });
     } catch (error) {
       console.log("Error deleting comment", error);
@@ -44,9 +48,9 @@ const Comment = ({ item, userId }) => {
             <ActivityIndicator size={"small"} color={Colors.error} />
           ) : (
             <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.deleteButton}
-              activeOpacity={0.8}
+              onPress={() => setShowAlert(true)}
+              activeOpacity={0.2}
+              hitSlop={10}
             >
               <FontAwesome5 name="trash" size={15} color={Colors.error} />
             </TouchableOpacity>
@@ -63,6 +67,21 @@ const Comment = ({ item, userId }) => {
         </Text>
       </View>
       <Text style={styles.commentText}>{item.content}</Text>
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Delete"
+        message="Are you sure you want to delete this comment? This action cannot be undone"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No, cancel"
+        confirmText="Yes, delete"
+        confirmButtonColor={Colors.error}
+        onCancelPressed={() => setShowAlert(false)}
+        onConfirmPressed={() => handleDelete()}
+      />
     </View>
   );
 };
@@ -93,6 +112,4 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
   },
-
-  deleteButton: {},
 });

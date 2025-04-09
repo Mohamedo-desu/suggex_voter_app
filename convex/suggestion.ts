@@ -143,9 +143,6 @@ export const addSuggestion = mutation({
     await db.patch(args.groupId, {
       suggestionsCount: group.suggestionsCount + 1,
     });
-    await db.patch(currentUser._id, {
-      suggestionsCount: currentUser.suggestionsCount + 1,
-    });
   },
 });
 
@@ -292,15 +289,6 @@ export const deleteGroup = mutation({
         await db.delete(invitation._id);
       }
 
-      // Delete bookmarks.
-      const bookmarks = await db
-        .query("bookmarks")
-        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
-        .collect();
-      for (const bookmark of bookmarks) {
-        await db.delete(bookmark._id);
-      }
-
       // Delete likes.
       const likes = await db
         .query("likes")
@@ -308,15 +296,6 @@ export const deleteGroup = mutation({
         .collect();
       for (const like of likes) {
         await db.delete(like._id);
-      }
-
-      // Delete notifications related to this suggestion.
-      const notifications = await db
-        .query("notifications")
-        .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
-        .collect();
-      for (const notification of notifications) {
-        await db.delete(notification._id);
       }
 
       // Delete the suggestion itself.
@@ -339,43 +318,6 @@ export const deleteGroup = mutation({
   },
 });
 
-export const updateSuggestion = mutation({
-  args: {
-    suggestionId: v.id("suggestions"),
-    suggestionTitle: v.optional(v.string()),
-    suggestionDescription: v.optional(v.string()),
-    endGoal: v.optional(v.number()),
-    status: v.optional(v.string()),
-  },
-  handler: async (
-    ctx,
-    { suggestionId, suggestionTitle, suggestionDescription, endGoal, status }
-  ) => {
-    const { db } = ctx;
-    const currentUser = await getAuthenticatedUser(ctx);
-
-    const suggestion = await db.get(suggestionId);
-    if (!suggestion) {
-      throw new Error("Suggestion not found");
-    }
-
-    // Only the suggestion owner can update the suggestion.
-    if (suggestion.userId !== currentUser._id) {
-      throw new Error("Only the suggestion owner can update this suggestion.");
-    }
-
-    const updateFields: Record<string, unknown> = {};
-    if (suggestionTitle !== undefined) updateFields.title = suggestionTitle;
-    if (suggestionDescription !== undefined)
-      updateFields.description = suggestionDescription;
-    if (endGoal !== undefined) updateFields.endGoal = endGoal;
-    if (status !== undefined) updateFields.status = status;
-
-    await db.patch(suggestionId, updateFields);
-    return true;
-  },
-});
-
 export const deleteSuggestion = mutation({
   args: {
     suggestionId: v.id("suggestions"),
@@ -393,8 +335,6 @@ export const deleteSuggestion = mutation({
     if (suggestion.userId !== currentUser._id) {
       throw new Error("Only the suggestion owner can delete this suggestion.");
     }
-
-    // Cascade deletion for related records.
 
     // Delete all comments related to this suggestion.
     const comments = await db
@@ -414,15 +354,6 @@ export const deleteSuggestion = mutation({
       await db.delete(invitation._id);
     }
 
-    // Delete bookmarks associated with this suggestion.
-    const bookmarks = await db
-      .query("bookmarks")
-      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
-      .collect();
-    for (const bookmark of bookmarks) {
-      await db.delete(bookmark._id);
-    }
-
     // Delete likes associated with this suggestion.
     const likes = await db
       .query("likes")
@@ -432,22 +363,9 @@ export const deleteSuggestion = mutation({
       await db.delete(like._id);
     }
 
-    // Delete notifications related to this suggestion.
-    const notifications = await db
-      .query("notifications")
-      .withIndex("by_suggestion", (q) => q.eq("suggestionId", suggestionId))
-      .collect();
-    for (const notification of notifications) {
-      await db.delete(notification._id);
-    }
-
     // Finally, delete the suggestion itself.
     await db.delete(suggestionId);
 
-    // decrement user suggestion and group suggestion
-    await db.patch(currentUser._id, {
-      suggestionsCount: Math.max(0, (currentUser.suggestionsCount || 1) - 1),
-    });
     const group = await db.get(suggestion.groupId);
     if (!group) throw new Error("Group not found");
 
@@ -713,15 +631,7 @@ export const toggleLike = mutation({
       await db.patch(args.suggestionId, {
         likesCount: suggestion.likesCount + 1,
       });
-      // IF NOT MY POST SEND NOTIFICATION
-      if (currentUser._id !== suggestion.userId) {
-        await db.insert("notifications", {
-          receiverId: suggestion.userId,
-          senderId: currentUser._id,
-          suggestionId: args.suggestionId,
-          type: "like",
-        });
-      }
+
       return true; //liked
     }
   },

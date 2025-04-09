@@ -7,7 +7,7 @@ import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { GroupProps, SuggestionProps } from "@/types";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useQuery } from "convex/react";
@@ -24,11 +24,11 @@ import {
 const GroupDetails: FC = () => {
   const { groupId } = useLocalSearchParams();
   const router = useRouter();
-  const { user } = useUser();
+  const { userId } = useAuth();
 
   const currentUser = useQuery(
     api.user.getUserByClerkId,
-    user?.id ? { clerkId: user?.id } : "skip"
+    userId ? { clerkId: userId } : "skip"
   );
 
   // Query group suggestions.
@@ -43,7 +43,7 @@ const GroupDetails: FC = () => {
 
   // Render each suggestion item.
   const renderItem = ({ item }: { item: SuggestionProps }) => (
-    <Suggestion item={item} userId={user.id} />
+    <Suggestion item={item} userId={userId} />
   );
 
   const navigation = useNavigation();
@@ -59,13 +59,8 @@ const GroupDetails: FC = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: (props) => (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          hitSlop={10}
-          onPress={onShare}
-          {...props}
-        >
+      headerRight: () => (
+        <TouchableOpacity activeOpacity={0.8} hitSlop={10} onPress={onShare}>
           <Ionicons name="share-outline" size={25} color={Colors.primary} />
         </TouchableOpacity>
       ),
@@ -84,7 +79,7 @@ const GroupDetails: FC = () => {
     ) {
       router.back();
     }
-  }, [groupDetails, router, user]);
+  }, [groupDetails, router, userId]);
 
   useEffect(() => {
     // Check for deleted (or non-existent) group.

@@ -3,9 +3,6 @@ import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 
 export const createUser = mutation({
   args: {
-    username: v.string(),
-    fullname: v.string(),
-    image: v.string(),
     email: v.string(),
     clerkId: v.string(),
   },
@@ -20,13 +17,8 @@ export const createUser = mutation({
 
     // CREATE USER
     await ctx.db.insert("users", {
-      username: args.username,
-      fullname: args.fullname,
-      image: args.image,
       email: args.email,
       clerkId: args.clerkId,
-      commentsCount: 0,
-      suggestionsCount: 0,
     });
   },
 });

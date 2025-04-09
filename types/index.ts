@@ -49,6 +49,7 @@ export interface SuggestionProps {
   likesCount: number;
   endGoal: number;
   status: string;
+  hasLiked: boolean;
   _creationTime: number | Date;
 }
 

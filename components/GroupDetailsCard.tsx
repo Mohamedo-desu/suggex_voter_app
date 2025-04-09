@@ -10,16 +10,18 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
   if (!groupDetails) return null;
+
+  const [showAlert, setShowAlert] = useState(false);
 
   const [deleting, setDeleting] = useState(false);
 
@@ -48,30 +50,15 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
   const handleDeleteGroup = async () => {
     try {
       if (deleting) return;
+      setShowAlert(false);
 
       setDeleting(true);
-      Alert.alert(
-        "Delete Group",
-        "Are you sure you want to delete this group?\nThis action cannot be undone.",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              await deleteGroup({ groupId: groupDetails._id as Id<"groups"> });
-              router.back();
-            },
-          },
-        ]
-      );
+
+      await deleteGroup({ groupId: groupDetails._id as Id<"groups"> });
+      setDeleting(false);
+      router.back();
     } catch (error) {
       console.error("Failed to delete group", error);
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -82,18 +69,11 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
           <Text style={styles.groupNameText}>{groupName}</Text>
           {role === "owner" && (
             <View style={styles.actionButtons}>
-              <TouchableOpacity
-                onPress={handleEditGroup}
-                style={styles.editButton}
-              >
-                <FontAwesome5 name="edit" size={20} color={Colors.primary} />
-              </TouchableOpacity>
-
               {deleting ? (
                 <ActivityIndicator size={"small"} color={Colors.error} />
               ) : (
                 <TouchableOpacity
-                  onPress={handleDeleteGroup}
+                  onPress={() => setShowAlert(true)}
                   style={styles.deleteButton}
                 >
                   <FontAwesome5 name="trash" size={20} color={Colors.error} />
@@ -136,6 +116,21 @@ const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
           </View>
         ))}
       </View>
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Delete"
+        message="Are you sure you want to delete this group? This action cannot be undone"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No, cancel"
+        confirmText="Yes, delete"
+        confirmButtonColor={Colors.error}
+        onCancelPressed={() => setShowAlert(false)}
+        onConfirmPressed={() => handleDeleteGroup()}
+      />
     </View>
   );
 };

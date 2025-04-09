@@ -1,8 +1,14 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
-import React, { FC, useEffect, useMemo } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { FC, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 import Animated, {
   useAnimatedStyle,
@@ -15,16 +21,20 @@ import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { SuggestionProps } from "@/types";
 import { router } from "expo-router";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 interface SuggestionDetailsCardProps {
   item: SuggestionProps;
-  userId?: string;
+  userId: string;
 }
 
 const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   item,
   userId,
 }) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
   const toggleLike = useMutation(api.suggestion.toggleLike);
 
@@ -45,32 +55,19 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
     });
   }, [item?._creationTime]);
 
-  const handleEdit = () => {
-    console.log("Edit suggestion", item?._id);
-    // TODO: implement update suggestion mutation.
-  };
+  const handleDelete = async () => {
+    try {
+      if (deleting) return;
+      setDeleting(true);
 
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Suggestion",
-      "Are you sure you want to delete this suggestion? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // TODO: call deleteSuggestion mutation.
-              await deleteSuggestion({ suggestionId: item?._id });
-              router.back();
-            } catch (error) {
-              console.error("Failed to delete suggestion:", error);
-            }
-          },
-        },
-      ]
-    );
+      setShowAlert(false);
+
+      await deleteSuggestion({ suggestionId: item?._id });
+      setDeleting(false);
+      router.back();
+    } catch (error) {
+      console.error("Failed to delete suggestion:", error);
+    }
   };
 
   // Calculate progress relative to the endGoal.
@@ -110,20 +107,17 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
         </Text>
         {isOwner && (
           <View style={styles.actionButtons}>
-            <TouchableOpacity
-              onPress={handleEdit}
-              style={styles.actionButton}
-              disabled={isClosed}
-            >
-              <FontAwesome5 name="edit" size={15} color={Colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.actionButton}
-              disabled={isClosed}
-            >
-              <FontAwesome5 name="trash" size={15} color={Colors.error} />
-            </TouchableOpacity>
+            {deleting ? (
+              <ActivityIndicator size={"small"} color={Colors.error} />
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowAlert(true)}
+                style={styles.actionButton}
+                disabled={isClosed}
+              >
+                <FontAwesome5 name="trash" size={15} color={Colors.error} />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
@@ -175,6 +169,21 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
           <Text style={styles.progressText}>{Math.round(progress)}%</Text>
         </View>
       </View>
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Delete"
+        message="Are you sure you want to delete this suggestion? This action cannot be undone"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No, cancel"
+        confirmText="Yes, delete"
+        confirmButtonColor={Colors.error}
+        onCancelPressed={() => setShowAlert(false)}
+        onConfirmPressed={() => handleDelete()}
+      />
     </View>
   );
 };

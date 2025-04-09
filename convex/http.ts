@@ -55,19 +55,14 @@ http.route({
     const eventType = evt.type;
 
     if (eventType === "user.created") {
-      const { id, email_addresses, first_name, last_name, image_url } =
-        evt.data;
+      const { id, email_addresses } = evt.data;
 
       const email = email_addresses[0].email_address;
-      const name = `${first_name || ""} ${last_name || ""}`.trim();
 
       try {
         await ctx.runMutation(api.user.createUser, {
           email,
           clerkId: id,
-          image: image_url,
-          fullname: name,
-          username: email.split("@")[0],
         });
       } catch (error) {
         console.log("Error creating user", error);
