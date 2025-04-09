@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 10,
     marginTop: 5,
+    zIndex: 10,
   },
   headerContainer: {
     justifyContent: "space-between",

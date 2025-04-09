@@ -26,6 +26,11 @@ const GroupDetails: FC = () => {
   const router = useRouter();
   const { user } = useUser();
 
+  const currentUser = useQuery(
+    api.user.getUserByClerkId,
+    user?.id ? { clerkId: user?.id } : "skip"
+  );
+
   // Query group suggestions.
   const suggestions = useQuery(api.suggestion.fetchSuggestions, {
     groupId: groupId as Id<"groups">,
@@ -70,10 +75,14 @@ const GroupDetails: FC = () => {
   // Navigate back automatically if the group is inactive.
   useEffect(() => {
     if (!groupDetails) return;
-    if (groupDetails.status !== "open") {
+
+    if (
+      groupDetails.status !== "open" &&
+      groupDetails.userId !== currentUser?._id
+    ) {
       router.back();
     }
-  }, [groupDetails, router]);
+  }, [groupDetails, router, user]);
 
   if (suggestions === undefined) return <Loader />;
 

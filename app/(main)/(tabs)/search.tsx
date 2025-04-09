@@ -90,17 +90,20 @@ const SearchScreen: React.FC = () => {
   const handleRequestToJoin = async () => {
     if (!result || !user) return;
     try {
-      let invitationId: string | unknown = null;
       // Use the invitationCode from the result record
       if (resultType === "group") {
-        invitationId = await requestGroupJoinMutation({
+        await requestGroupJoinMutation({
           invitationCode: (result as GroupItemProps).invitationCode,
         });
       } else if (resultType === "suggestion") {
-        invitationId = await requestSuggestionJoinMutation({
+        await requestSuggestionJoinMutation({
           invitationCode: (result as SuggestionProps).invitationCode,
         });
       }
+
+      setSearchPhrase("");
+      setResult(null);
+      setResultType(null);
       router.back();
     } catch (err) {
       console.error("Request failed", err);

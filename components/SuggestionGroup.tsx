@@ -1,7 +1,9 @@
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
-import { GroupItemProps } from "@/types";
+import { api } from "@/convex/_generated/api";
+import { GroupProps } from "@/types";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
@@ -16,7 +18,10 @@ import {
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 
-const SuggestionGroup: React.FC<{ item: GroupItemProps }> = ({ item }) => {
+const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
+  item,
+  userId,
+}) => {
   const router = useRouter();
 
   if (!item) return null;
@@ -44,15 +49,21 @@ const SuggestionGroup: React.FC<{ item: GroupItemProps }> = ({ item }) => {
     return groupName.length > 25 ? groupName.slice(0, 25) + "..." : groupName;
   }, [groupName]);
 
+  const currentUser = useQuery(
+    api.user.getUserByClerkId,
+    userId ? { clerkId: userId } : "skip"
+  );
+  const isOwner = currentUser?._id === item.userId;
+
   const containerStyle: StyleProp<ViewStyle> = useMemo(
     () => [
       styles.container,
       {
         borderBottomColor: borderColor,
-        opacity: groupActive || isPrivate ? 1 : 0.6,
+        opacity: groupActive || isOwner || isPrivate ? 1 : 0.6,
       },
     ],
-    [borderColor, groupActive, isPrivate]
+    [borderColor, groupActive, isPrivate, isOwner]
   );
 
   return (
@@ -65,7 +76,7 @@ const SuggestionGroup: React.FC<{ item: GroupItemProps }> = ({ item }) => {
         })
       }
       activeOpacity={0.8}
-      disabled={!groupActive || isPrivate}
+      disabled={isOwner ? false : !groupActive || isPrivate}
     >
       <View style={styles.iconContainer}>
         <FontAwesome5
