@@ -98,21 +98,18 @@ const GroupDetails: FC = () => {
   return (
     <>
       <GroupDetailsCard groupDetails={groupDetails} />
-      {suggestions.length > 0 && (
-        <>
-          <FlatList
-            data={suggestions}
-            keyExtractor={(item) => item._id}
-            renderItem={renderItem}
-            ListEmptyComponent={<Empty text="No suggestions found" />}
-            contentContainerStyle={styles.contentContainer}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <Text style={styles.resultHeader}>Suggestions</Text>
-            }
-          />
-        </>
-      )}
+
+      <FlatList
+        data={suggestions}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        ListEmptyComponent={<Empty text="No suggestions found" />}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Text style={styles.resultHeader}>Suggestions</Text>
+        }
+      />
     </>
   );
 };

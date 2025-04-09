@@ -203,6 +203,7 @@ export const fetchSuggestions = query({
       suggestions = await db
         .query("suggestions")
         .withIndex("by_group", (q) => q.eq("groupId", groupId))
+        .order("desc")
         .collect();
       return suggestions;
     }
@@ -220,11 +221,13 @@ export const fetchSuggestions = query({
       suggestions = await db
         .query("suggestions")
         .withIndex("by_group", (q) => q.eq("groupId", groupId))
+        .order("desc")
         .collect();
     } else {
       const suggestionInvitations = await db
         .query("suggestionInvitations")
         .withIndex("by_user", (q) => q.eq("userId", currentUser._id))
+        .order("desc")
         .collect();
       const invitedSuggestionIds = suggestionInvitations.map(
         (inv) => inv.suggestionId
@@ -462,11 +465,21 @@ export const fetchSuggestionDetails = query({
   },
   handler: async (ctx, { suggestionId }) => {
     const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
     const suggestion = await db.get(suggestionId);
     if (!suggestion) {
-      throw new Error("Suggestion not found");
+      return null;
     }
-    return suggestion;
+
+    const liked = await db
+      .query("likes")
+      .withIndex("by_user_and_suggestion", (q) =>
+        q.eq("userId", currentUser._id).eq("suggestionId", suggestion._id)
+      )
+      .first();
+
+    return { ...suggestion, hasLiked: !!liked };
   },
 });
 
@@ -659,5 +672,57 @@ export const requestToJoinSuggestion = mutation({
       userId: currentUser._id,
     });
     return invitationId;
+  },
+});
+
+export const toggleLike = mutation({
+  args: {
+    suggestionId: v.id("suggestions"),
+  },
+  handler: async (ctx, args) => {
+    const { db } = ctx;
+
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const existing = await db
+      .query("likes")
+      .withIndex("by_user_and_suggestion", (q) =>
+        q.eq("userId", currentUser._id).eq("suggestionId", args.suggestionId)
+      )
+      .first();
+
+    const suggestion = await db.get(args.suggestionId);
+
+    if (!suggestion) {
+      throw new Error("suggestion not found");
+    }
+
+    if (existing) {
+      // REMOVE LIKE
+      await db.delete(existing._id);
+      await db.patch(args.suggestionId, {
+        likesCount: Math.max(0, (suggestion.likesCount || 1) - 1),
+      });
+      return false; //unliked
+    } else {
+      // ADD LIKE
+      await db.insert("likes", {
+        suggestionId: args.suggestionId,
+        userId: currentUser._id,
+      });
+      await db.patch(args.suggestionId, {
+        likesCount: suggestion.likesCount + 1,
+      });
+      // IF NOT MY POST SEND NOTIFICATION
+      if (currentUser._id !== suggestion.userId) {
+        await db.insert("notifications", {
+          receiverId: suggestion.userId,
+          senderId: currentUser._id,
+          suggestionId: args.suggestionId,
+          type: "like",
+        });
+      }
+      return true; //liked
+    }
   },
 });

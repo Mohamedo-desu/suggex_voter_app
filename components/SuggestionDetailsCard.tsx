@@ -1,4 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import React, { FC, useEffect, useMemo } from "react";
@@ -26,6 +26,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   userId,
 }) => {
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
+  const toggleLike = useMutation(api.suggestion.toggleLike);
 
   // Fetch authenticated user details if a userId is provided.
   const currentUser = useQuery(
@@ -91,6 +92,16 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
     width: `${progressShared.value}%`,
   }));
 
+  const hasLiked = item?.hasLiked;
+
+  const handleLike = async () => {
+    try {
+      await toggleLike({ suggestionId: item._id });
+    } catch (error) {
+      console.log("Error liking or disliking a post", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -142,7 +153,27 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
         <View style={styles.progressBar}>
           <Animated.View style={[styles.progressFill, progressAnimatedStyle]} />
         </View>
-        <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 10,
+          }}
+        >
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleLike}
+            hitSlop={10}
+          >
+            <Ionicons
+              name={hasLiked ? "heart" : "heart-outline"}
+              size={20}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+          <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+        </View>
       </View>
     </View>
   );
@@ -235,7 +266,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.Regular,
     color: Colors.textDark,
-    alignSelf: "flex-end",
-    marginTop: 4,
   },
 });

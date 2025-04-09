@@ -42,8 +42,6 @@ const SuggestionDetails: FC = () => {
     }
   }, [suggestionDetails]);
 
-  console.log({ comments });
-
   const handleAddComment = async () => {
     try {
       if (!newComment.trim() || !suggestionId) {

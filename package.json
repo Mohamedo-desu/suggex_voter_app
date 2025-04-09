@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "build:android": "eas build --platform android --profile production",
+    "build:android": "eas build --platform android --profile preview",
     "publish:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
     "upgrade": "bun install expo@latest && bunx expo install --fix",
     "android": "bunx expo run:android --device",
@@ -34,6 +34,7 @@
     "expo-secure-store": "^14.0.1",
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
+    "expo-updates": "~0.27.4",
     "expo-web-browser": "~14.0.2",
     "formik": "^2.4.6",
     "nanoid": "^5.1.5",

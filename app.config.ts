@@ -16,8 +16,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   console.log("⚙️ Building app for environment:", process.env.APP_ENV);
   const { name, bundleIdentifier, icon, adaptiveIcon, packageName, scheme } =
     getDynamicAppConfig(
-      (process.env.APP_ENV as "development" | "preview" | "production") ||
-        "development"
+      (process.env.EXPO_PUBLIC_APP_ENV as
+        | "development"
+        | "preview"
+        | "production") || "preview"
     );
 
   return {
