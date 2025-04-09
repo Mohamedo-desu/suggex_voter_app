@@ -31,8 +31,7 @@ export default defineSchema({
   groupInvitations: defineTable({
     groupId: v.id("groups"),
     userId: v.id("users"),
-    invitedBy: v.id("users"),
-    invitedAt: v.string(), // ISO timestamp
+    allSuggestions: v.boolean(),
   })
     .index("by_group", ["groupId"])
     .index("by_user", ["userId"])
@@ -65,8 +64,6 @@ export default defineSchema({
   suggestionInvitations: defineTable({
     suggestionId: v.id("suggestions"),
     userId: v.id("users"),
-    invitedBy: v.id("users"),
-    invitedAt: v.string(), // ISO timestamp
   })
     .index("by_suggestion", ["suggestionId"])
     .index("by_user", ["userId"])

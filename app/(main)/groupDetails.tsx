@@ -29,7 +29,7 @@ const GroupDetails: FC = () => {
   // Query group suggestions.
   const suggestions = useQuery(api.suggestion.fetchSuggestions, {
     groupId: groupId as Id<"groups">,
-  });
+  }) as SuggestionProps[];
 
   // Query group details.
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {

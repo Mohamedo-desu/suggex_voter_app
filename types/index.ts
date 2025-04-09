@@ -22,6 +22,9 @@ export interface GroupProps {
   suggestionsCount: number;
   status: string;
   _creationTime: number | Date;
+  role: string;
+  approvedCount: number;
+  rejectedCount: number;
 }
 
 /** Group Invitations table: many-to-many relationship between groups and users. */

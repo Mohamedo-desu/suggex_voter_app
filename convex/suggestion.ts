@@ -100,38 +100,6 @@ export const addGroup = mutation({
   },
 });
 
-export const inviteUserToGroup = mutation({
-  args: {
-    groupId: v.id("groups"),
-    invitedUserId: v.id("users"),
-  },
-  handler: async (ctx, { groupId, invitedUserId }) => {
-    const { db } = ctx;
-    const currentUser = await getAuthenticatedUser(ctx);
-
-    // Check that the group exists.
-    const group = await db.get(groupId);
-    if (!group) {
-      throw new Error("Group not found");
-    }
-
-    // Optional: Enforce that only the group owner can invite.
-    if (group.userId !== currentUser._id) {
-      throw new Error("Only the group owner can invite users.");
-    }
-
-    // Insert a new invitation record into the groupInvitations table.
-    const invitationId = await db.insert("groupInvitations", {
-      groupId,
-      userId: invitedUserId,
-      invitedBy: currentUser._id,
-      invitedAt: new Date().toISOString(),
-    });
-
-    return invitationId;
-  },
-});
-
 export const addSuggestion = mutation({
   args: {
     groupId: v.id("groups"),
@@ -224,14 +192,56 @@ export const fetchSuggestions = query({
   },
   handler: async (ctx, { groupId }) => {
     const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
     const group = await db.get(groupId);
     if (!group) throw new Error("Group not found");
 
-    const suggestions = await db
-      .query("suggestions")
-      .withIndex("by_group", (q) => q.eq("groupId", groupId))
-      .collect();
-    return suggestions;
+    let suggestions;
+
+    if (group.userId === currentUser._id) {
+      suggestions = await db
+        .query("suggestions")
+        .withIndex("by_group", (q) => q.eq("groupId", groupId))
+        .collect();
+
+      return suggestions;
+    }
+
+    const existingRequest = await db
+      .query("groupInvitations")
+      .withIndex("by_both", (q) =>
+        q.eq("groupId", group._id).eq("userId", currentUser._id)
+      )
+      .first();
+
+    if (!existingRequest) throw new Error("You have no group invitations");
+
+    if (existingRequest.allSuggestions) {
+      suggestions = await db
+        .query("suggestions")
+        .withIndex("by_group", (q) => q.eq("groupId", groupId))
+        .collect();
+    } else {
+      const suggestionInvitations = await db
+        .query("suggestionInvitations")
+        .withIndex("by_user", (q) => q.eq("userId", currentUser._id))
+        .collect();
+      const invitedSuggestionIds = suggestionInvitations.map(
+        (inv) => inv.suggestionId
+      );
+      suggestions = await Promise.all(
+        invitedSuggestionIds.map(async (suggestionId) => {
+          const suggestion = await db.get(suggestionId);
+          // Ensure the suggestion belongs to the group.
+          if (suggestion && suggestion.groupId === groupId) {
+            return suggestion;
+          }
+          return null;
+        })
+      );
+    }
+    return suggestions.filter((suggestion) => suggestion !== null);
   },
 });
 
@@ -516,7 +526,6 @@ export const searchGroupsByInvitationCode = mutation({
 
     foundGroup = {
       ...group,
-      groupName: "Private",
       suggestionsCount: 0,
       approvedCount: 0,
       rejectedCount: 0,
@@ -552,8 +561,6 @@ export const searchSuggestionsByInvitationCode = mutation({
 
     foundSuggestion = {
       ...suggestion,
-      title: "Private",
-      description: "private",
       commentsCount: 0,
       endGoal: 0,
       likesCount: 0,
@@ -561,5 +568,100 @@ export const searchSuggestionsByInvitationCode = mutation({
     };
 
     return foundSuggestion;
+  },
+});
+
+export const requestToJoinGroup = mutation({
+  args: {
+    invitationCode: v.string(),
+  },
+  handler: async (ctx, { invitationCode }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    // Look up the group by invitationCode
+    const group = await db
+      .query("groups")
+      .withIndex("search_invitation", (q) =>
+        q.eq("invitationCode", invitationCode)
+      )
+      .first();
+    if (!group) throw new Error("Group not found");
+
+    // Prevent owner from joining their own group.
+    if (group.userId === currentUser._id) {
+      throw new Error("Owner cannot request to join their own group");
+    }
+
+    // Check if a request (or invitation) already exists
+    const existingRequest = await db
+      .query("groupInvitations")
+      .withIndex("by_both", (q) =>
+        q.eq("groupId", group._id).eq("userId", currentUser._id)
+      )
+      .first();
+
+    if (existingRequest) {
+      db.patch(existingRequest._id, {
+        allSuggestions: true,
+      });
+      return;
+    }
+
+    const invitationId = await db.insert("groupInvitations", {
+      groupId: group._id,
+      userId: currentUser._id,
+      allSuggestions: true,
+    });
+    return invitationId;
+  },
+});
+export const requestToJoinSuggestion = mutation({
+  args: {
+    invitationCode: v.string(),
+  },
+  handler: async (ctx, { invitationCode }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    // Look up the suggestion by invitationCode
+    const suggestion = await db
+      .query("suggestions")
+      .withIndex("search_invitation", (q) =>
+        q.eq("invitationCode", invitationCode)
+      )
+      .first();
+    if (!suggestion) throw new Error("Suggestion not found");
+
+    const group = await db.get(suggestion.groupId);
+    if (!group) throw new Error("Group not found");
+
+    // Prevent owner from joining their own suggestion.
+    if (suggestion.userId === currentUser._id) {
+      throw new Error("Owner cannot request to join their own suggestion");
+    }
+
+    // Check if a join request already exists
+    const existingRequest = await db
+      .query("suggestionInvitations")
+      .withIndex("by_both", (q) =>
+        q.eq("suggestionId", suggestion._id).eq("userId", currentUser._id)
+      )
+      .first();
+    if (existingRequest) throw new Error("Request has already been sent");
+
+    // Insert a new group invitation record First.
+    await db.insert("groupInvitations", {
+      groupId: group._id,
+      userId: currentUser._id,
+      allSuggestions: false,
+    });
+    // Insert a new suggestion invitation record.
+
+    const invitationId = await db.insert("suggestionInvitations", {
+      suggestionId: suggestion._id,
+      userId: currentUser._id,
+    });
+    return invitationId;
   },
 });

@@ -2,7 +2,7 @@ import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { GroupItemProps } from "@/types";
+import { GroupProps } from "@/types";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -11,11 +11,7 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 
-const GroupDetailsCard = ({
-  groupDetails,
-}: {
-  groupDetails: GroupItemProps;
-}) => {
+const GroupDetailsCard = ({ groupDetails }: { groupDetails: GroupProps }) => {
   if (!groupDetails) return null;
 
   const deleteGroup = useMutation(api.suggestion.deleteGroup);
@@ -138,9 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  leftHeader: {
-    flex: 1,
-  },
+  leftHeader: {},
   groupNameText: {
     fontSize: 22,
     fontFamily: Fonts.Bold,

@@ -177,7 +177,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
         </View>
       </View>
 
-      {isOwner && (
+      {!isPrivate && (
         <View style={styles.progressWrapper}>
           <View style={styles.progressBarContainer}>
             <Animated.View
@@ -220,9 +220,7 @@ const styles = StyleSheet.create({
     right: -5,
     top: -6,
   },
-  content: {
-    flex: 1,
-  },
+  content: {},
   title: {
     fontSize: 18,
     fontFamily: Fonts.Medium,

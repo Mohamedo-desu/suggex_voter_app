@@ -47,7 +47,7 @@ const TabsLayout = () => {
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
-          title: "Search Suggestions Or Groups",
+          title: "Search Suggestion Or Group",
           headerTitleAlign: "center",
         }}
       />

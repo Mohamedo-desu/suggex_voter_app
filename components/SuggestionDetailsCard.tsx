@@ -151,10 +151,9 @@ export default SuggestionDetailsCard;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
-    elevation: 2,
-    borderRadius: 5,
+    elevation: 5,
     padding: 10,
-    marginBottom: 10,
+    marginTop: 5,
   },
   header: {
     flexDirection: "row",

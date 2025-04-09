@@ -1,12 +1,3 @@
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import SuggestionGroup from "@/components/SuggestionGroup";
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import { GroupItemProps, SuggestionProps } from "@/types";
-import { debounce } from "@/utils/functions";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
@@ -19,6 +10,17 @@ import {
   View,
 } from "react-native";
 
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import Suggestion from "@/components/Suggestion";
+import SuggestionGroup from "@/components/SuggestionGroup";
+import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
+import { api } from "@/convex/_generated/api";
+import { GroupItemProps, SuggestionProps } from "@/types";
+import { debounce } from "@/utils/functions";
+import { router } from "expo-router";
+
 const SearchScreen: React.FC = () => {
   const [result, setResult] = useState<GroupItemProps | SuggestionProps | null>(
     null
@@ -29,11 +31,20 @@ const SearchScreen: React.FC = () => {
 
   const { user } = useUser();
 
+  // Existing mutations for searching
   const searchGroupsMutation = useMutation(
     api.suggestion.searchGroupsByInvitationCode
   );
   const searchSuggestionsMutation = useMutation(
     api.suggestion.searchSuggestionsByInvitationCode
+  );
+
+  // New mutations for requesting to join
+  const requestGroupJoinMutation = useMutation(
+    api.suggestion.requestToJoinGroup
+  );
+  const requestSuggestionJoinMutation = useMutation(
+    api.suggestion.requestToJoinSuggestion
   );
 
   const handleSearch = useCallback(async () => {
@@ -44,7 +55,6 @@ const SearchScreen: React.FC = () => {
 
     if (trimmed && (isGroup || isSuggestion)) {
       setLoading(true);
-
       try {
         let res: any = null;
         if (isGroup) {
@@ -54,7 +64,6 @@ const SearchScreen: React.FC = () => {
           res = await searchSuggestionsMutation({ invitationCode: trimmed });
           setResultType("suggestion");
         }
-
         setResult(res || null);
       } catch (e) {
         console.error("Search failed: ", e);
@@ -65,12 +74,7 @@ const SearchScreen: React.FC = () => {
     } else {
       setResult(null);
     }
-  }, [
-    searchPhrase,
-    searchGroupsMutation,
-    searchSuggestionsMutation,
-    resultType,
-  ]);
+  }, [searchPhrase, searchGroupsMutation, searchSuggestionsMutation]);
 
   const debouncedHandleSearch = useMemo(
     () => debounce(handleSearch, 500),
@@ -81,6 +85,27 @@ const SearchScreen: React.FC = () => {
     api.user.getUserByClerkId,
     user?.id ? { clerkId: user?.id } : "skip"
   );
+
+  // Handler for join button press
+  const handleRequestToJoin = async () => {
+    if (!result || !user) return;
+    try {
+      let invitationId: string | unknown = null;
+      // Use the invitationCode from the result record
+      if (resultType === "group") {
+        invitationId = await requestGroupJoinMutation({
+          invitationCode: (result as GroupItemProps).invitationCode,
+        });
+      } else if (resultType === "suggestion") {
+        invitationId = await requestSuggestionJoinMutation({
+          invitationCode: (result as SuggestionProps).invitationCode,
+        });
+      }
+      router.back();
+    } catch (err) {
+      console.error("Request failed", err);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -128,15 +153,19 @@ const SearchScreen: React.FC = () => {
         ) : result && user ? (
           <>
             <Text style={styles.resultHeader}>Result</Text>
-
             {resultType === "group" ? (
               <SuggestionGroup item={result as GroupItemProps} />
             ) : (
               <Suggestion item={result as SuggestionProps} userId={user.id} />
             )}
+            {/* Show join button only if the current user is not the owner */}
             {currentUser?._id !== result.userId && (
               <View style={styles.footerContainer}>
-                <TouchableOpacity style={styles.joinButton} activeOpacity={0.8}>
+                <TouchableOpacity
+                  style={styles.joinButton}
+                  activeOpacity={0.8}
+                  onPress={handleRequestToJoin}
+                >
                   <Text style={styles.joinButtonText}>Request To Join</Text>
                 </TouchableOpacity>
               </View>
