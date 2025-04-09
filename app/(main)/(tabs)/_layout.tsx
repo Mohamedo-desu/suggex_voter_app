@@ -51,31 +51,6 @@ const TabsLayout = () => {
           headerTitleAlign: "center",
         }}
       />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ size, color }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
-          title: "Profile",
-          headerTitleAlign: "center",
-          headerRight: (props) => (
-            <TouchableOpacity
-              style={{ marginRight: 15 }}
-              activeOpacity={0.8}
-              hitSlop={10}
-              onPress={() => router.navigate("/(main)/settings")}
-              {...props}
-            >
-              <Ionicons
-                name="settings-outline"
-                size={25}
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
     </Tabs>
   );
 };
