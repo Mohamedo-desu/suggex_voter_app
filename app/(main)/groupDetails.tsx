@@ -8,18 +8,10 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { GroupProps, SuggestionProps } from "@/types";
 import { useAuth } from "@clerk/clerk-expo";
-import { Ionicons } from "@expo/vector-icons";
-import Clipboard from "@react-native-clipboard/clipboard";
 import { useQuery } from "convex/react";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { FC, useEffect } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  TouchableOpacity,
-} from "react-native";
+import { FlatList, StyleSheet, Text } from "react-native";
 
 const GroupDetails: FC = () => {
   const { groupId } = useLocalSearchParams();
@@ -46,27 +38,6 @@ const GroupDetails: FC = () => {
     <Suggestion item={item} userId={userId} />
   );
 
-  const navigation = useNavigation();
-
-  const onShare = async () => {
-    try {
-      Clipboard.setString(groupDetails?.invitationCode);
-      ToastAndroid.show("Copied to clipboard", ToastAndroid.SHORT);
-    } catch (error) {
-      console.log("Error sharing:", error);
-    }
-  };
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity activeOpacity={0.8} hitSlop={10} onPress={onShare}>
-          <Ionicons name="share-outline" size={25} color={Colors.primary} />
-        </TouchableOpacity>
-      ),
-    });
-  }, []);
-
   // Navigate back automatically if the group is inactive.
   useEffect(() => {
     if (!groupDetails) {
@@ -92,7 +63,7 @@ const GroupDetails: FC = () => {
 
   return (
     <>
-      <GroupDetailsCard groupDetails={groupDetails} />
+      <GroupDetailsCard item={groupDetails} userId={userId} />
 
       <FlatList
         data={suggestions}

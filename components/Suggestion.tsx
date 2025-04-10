@@ -80,7 +80,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
       styles.container,
       item?.status === "rejected" && styles.rejected,
       item?.status === "approved" && styles.approved,
-      isClosed && styles.closed,
+      isClosed && !isOwner && styles.closed,
       isPrivate && styles.private,
     ],
     [item?.status, isClosed, isPrivate]
@@ -108,7 +108,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
     <TouchableOpacity
       style={containerStyle}
       activeOpacity={0.8}
-      disabled={isClosed || isPrivate}
+      disabled={isOwner ? false : isClosed || isPrivate}
       onPress={() =>
         router.navigate({
           pathname: "/(main)/suggestionDetails",

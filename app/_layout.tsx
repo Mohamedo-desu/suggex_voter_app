@@ -15,6 +15,7 @@ import {
   useWindowDimensions,
   ViewStyle,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 LogBox.ignoreLogs(["Clerk: Clerk has been loaded with development keys."]);
@@ -56,6 +57,7 @@ Sentry.init({
   attachScreenshot: true,
   attachStacktrace: true,
   enableAutoPerformanceTracing: true,
+  enableNative: false,
 });
 
 const scope = Sentry.getGlobalScope();
@@ -118,7 +120,9 @@ const RootLayout: React.FC = () => {
     <ClerkAndConvexProvider>
       <SafeAreaProvider>
         <SafeAreaView style={[styles.container, getContentStyle()]}>
-          <InitialLayout />
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <InitialLayout />
+          </GestureHandlerRootView>
         </SafeAreaView>
       </SafeAreaProvider>
       <StatusBar style="dark" backgroundColor={Colors.background} />

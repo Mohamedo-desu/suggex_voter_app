@@ -1,7 +1,18 @@
-import { useUser } from "@clerk/clerk-expo";
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import Suggestion from "@/components/Suggestion";
+import SuggestionGroup from "@/components/SuggestionGroup";
+import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
+import { api } from "@/convex/_generated/api";
+import { GroupProps, SuggestionProps } from "@/types";
+import { debounce } from "@/utils/functions";
+import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useMutation, useQuery } from "convex/react";
-import React, { useCallback, useMemo, useState } from "react";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,26 +21,15 @@ import {
   View,
 } from "react-native";
 
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import SuggestionGroup from "@/components/SuggestionGroup";
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import { GroupItemProps, SuggestionProps } from "@/types";
-import { debounce } from "@/utils/functions";
-import { router } from "expo-router";
-
 const SearchScreen: React.FC = () => {
-  const [result, setResult] = useState<GroupItemProps | SuggestionProps | null>(
+  const [result, setResult] = useState<GroupProps | SuggestionProps | null>(
     null
   );
   const [searchPhrase, setSearchPhrase] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [resultType, setResultType] = useState<string | null>(null);
 
-  const { user } = useUser();
+  const { userId } = useAuth();
 
   // Existing mutations for searching
   const searchGroupsMutation = useMutation(
@@ -83,17 +83,17 @@ const SearchScreen: React.FC = () => {
 
   const currentUser = useQuery(
     api.user.getUserByClerkId,
-    user?.id ? { clerkId: user?.id } : "skip"
+    userId ? { clerkId: userId } : "skip"
   );
 
   // Handler for join button press
   const handleRequestToJoin = async () => {
-    if (!result || !user) return;
+    if (!result || !userId) return;
     try {
       // Use the invitationCode from the result record
       if (resultType === "group") {
         await requestGroupJoinMutation({
-          invitationCode: (result as GroupItemProps).invitationCode,
+          invitationCode: (result as GroupProps).invitationCode,
         });
       } else if (resultType === "suggestion") {
         await requestSuggestionJoinMutation({
@@ -109,6 +109,31 @@ const SearchScreen: React.FC = () => {
       console.error("Request failed", err);
     }
   };
+
+  useEffect(() => {
+    const getCopiedText = async () => {
+      try {
+        const copiedText = await Clipboard.getString();
+
+        console.log("Clipboard content:", copiedText);
+
+        if (!copiedText) return;
+
+        const isGroup =
+          copiedText.startsWith("grp") && copiedText.endsWith("G0g");
+        const isSuggestion =
+          copiedText.startsWith("sug") && copiedText.endsWith("S0s");
+
+        if (!isGroup || !isSuggestion) {
+          return;
+        }
+        setSearchPhrase(copiedText);
+      } catch (error) {
+        console.log("Failed to get clipboard content:", error);
+      }
+    };
+    getCopiedText();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -147,19 +172,41 @@ const SearchScreen: React.FC = () => {
             <Ionicons name="search" size={22} color={Colors.primary} />
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            padding: 10,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 5,
+            borderRadius: 5,
+          }}
+          activeOpacity={0.8}
+          onPress={() => Clipboard.getString().then(setSearchPhrase)}
+        >
+          <Text
+            style={{
+              color: Colors.white,
+              fontSize: 14,
+              fontFamily: Fonts.Regular,
+            }}
+          >
+            paste from clipboard
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Search Results */}
       <View style={styles.resultsContainer}>
         {loading ? (
           <Loader />
-        ) : result && user ? (
+        ) : result && userId ? (
           <>
             <Text style={styles.resultHeader}>Result</Text>
             {resultType === "group" ? (
-              <SuggestionGroup item={result as GroupItemProps} />
+              <SuggestionGroup item={result as GroupProps} userId={userId} />
             ) : (
-              <Suggestion item={result as SuggestionProps} userId={user.id} />
+              <Suggestion item={result as SuggestionProps} userId={userId} />
             )}
             {/* Show join button only if the current user is not the owner */}
             {currentUser?._id !== result.userId && (
@@ -236,5 +283,16 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontFamily: Fonts.Medium,
+  },
+  pasteButton: {
+    marginTop: 10,
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+  },
+  pasteButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
 });

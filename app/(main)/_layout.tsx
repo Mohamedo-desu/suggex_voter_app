@@ -1,9 +1,6 @@
-import Colors from "@/constants/colors";
 import { useUser } from "@clerk/clerk-expo";
-import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Stack } from "expo-router";
 import React from "react";
-import { TouchableOpacity } from "react-native";
 
 const MainLayout = () => {
   const { user } = useUser();
@@ -11,11 +8,7 @@ const MainLayout = () => {
   if (!user) return <Redirect href={"/(auth)"} />;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-      }}
-    >
+    <Stack>
       <Stack.Screen
         name="(tabs)"
         options={{
@@ -45,25 +38,15 @@ const MainLayout = () => {
       <Stack.Screen
         name="groupDetails"
         options={{
-          title: "Inside Box",
+          title: "Group Details",
           headerTitleAlign: "center",
         }}
       />
       <Stack.Screen
         name="suggestionDetails"
         options={{
-          title: "Inside Suggestion",
+          title: "Suggestion Details",
           headerTitleAlign: "center",
-          headerRight: (props) => (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              hitSlop={10}
-              onPress={() => undefined}
-              {...props}
-            >
-              <Ionicons name="share-outline" size={25} color={Colors.primary} />
-            </TouchableOpacity>
-          ),
         }}
       />
     </Stack>

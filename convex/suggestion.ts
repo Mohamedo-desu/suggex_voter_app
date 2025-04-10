@@ -636,3 +636,47 @@ export const toggleLike = mutation({
     }
   },
 });
+
+export const editGroup = mutation({
+  args: {
+    groupId: v.id("groups"),
+    groupName: v.string(),
+    invitationCode: v.string(),
+    status: v.union(v.literal("open"), v.literal("closed")),
+  },
+  handler: async (ctx, { groupId, groupName, status, invitationCode }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const group = await db.get(groupId);
+    if (!group) throw new Error("Group not found");
+
+    if (group.userId !== currentUser._id) throw new Error("Unauthorized");
+
+    await db.patch(groupId, { groupName, status, invitationCode });
+  },
+});
+export const editSuggestion = mutation({
+  args: {
+    suggestionId: v.id("suggestions"),
+    invitationCode: v.string(),
+    status: v.union(
+      v.literal("open"),
+      v.literal("rejected"),
+      v.literal("approved"),
+      v.literal("closed")
+    ),
+    endGoal: v.number(),
+  },
+  handler: async (ctx, { suggestionId, invitationCode, status, endGoal }) => {
+    const { db } = ctx;
+    const currentUser = await getAuthenticatedUser(ctx);
+
+    const suggestion = await db.get(suggestionId);
+    if (!suggestion) throw new Error("Suggestion not found");
+
+    if (suggestion.userId !== currentUser._id) throw new Error("Unauthorized");
+
+    await db.patch(suggestionId, { invitationCode, status, endGoal });
+  },
+});
