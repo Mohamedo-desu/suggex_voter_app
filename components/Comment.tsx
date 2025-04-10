@@ -1,12 +1,14 @@
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
+import { CommentProps } from "@/types";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,7 +16,12 @@ import {
 } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 
-const Comment = ({ item, userId }) => {
+interface CommentItemProps {
+  item: CommentProps;
+  userId: string;
+}
+
+const Comment = ({ item, userId }: CommentItemProps) => {
   const currentUser = useQuery(
     api.user.getUserByClerkId,
     userId ? { clerkId: userId } : "skip"
@@ -25,6 +32,7 @@ const Comment = ({ item, userId }) => {
   const [showAlert, setShowAlert] = useState(false);
 
   const deleteComment = useMutation(api.comment.deleteComment);
+
   const handleDelete = async () => {
     try {
       if (deleting) return;
@@ -41,32 +49,47 @@ const Comment = ({ item, userId }) => {
   };
 
   return (
-    <View style={styles.commentContainer}>
-      {isOwner && (
-        <View style={styles.actionButtons}>
-          {deleting ? (
-            <ActivityIndicator size={"small"} color={Colors.error} />
-          ) : (
-            <TouchableOpacity
-              onPress={() => setShowAlert(true)}
-              activeOpacity={0.2}
-              hitSlop={10}
-            >
-              <FontAwesome5 name="trash" size={15} color={Colors.error} />
-            </TouchableOpacity>
-          )}
+    <>
+      <View style={styles.commentContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.commentAuthor}>Anonymous</Text>
+            <Text style={styles.commentAuthor}>
+              {" "}
+              •{" "}
+              {formatDistanceToNowStrict(item._creationTime, {
+                addSuffix: true,
+              })}
+            </Text>
+          </View>
+          {isOwner &&
+            (deleting ? (
+              <ActivityIndicator size={"small"} color={Colors.error} />
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS === "web") {
+                    handleDelete();
+                  } else {
+                    setShowAlert(true);
+                  }
+                }}
+                activeOpacity={0.2}
+                hitSlop={10}
+              >
+                <FontAwesome5 name="trash" size={15} color={Colors.error} />
+              </TouchableOpacity>
+            ))}
         </View>
-      )}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.commentAuthor}>Anonymous</Text>
-        <Text style={styles.commentAuthor}>
-          {item.author} •{" "}
-          {formatDistanceToNowStrict(new Date(item._creationTime), {
-            addSuffix: true,
-          })}
-        </Text>
+
+        <Text style={styles.commentText}>{item.content}</Text>
       </View>
-      <Text style={styles.commentText}>{item.content}</Text>
       <AwesomeAlert
         show={showAlert}
         showProgress={false}
@@ -82,7 +105,7 @@ const Comment = ({ item, userId }) => {
         onCancelPressed={() => setShowAlert(false)}
         onConfirmPressed={() => handleDelete()}
       />
-    </View>
+    </>
   );
 };
 
@@ -104,12 +127,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.Medium,
     color: Colors.textDark,
-  },
-  actionButtons: {
-    flexDirection: "row",
-    gap: 10,
-    position: "absolute",
-    top: 10,
-    right: 10,
   },
 });
