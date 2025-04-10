@@ -1,25 +1,21 @@
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import SuggestionGroup from "@/components/SuggestionGroup";
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import { GroupProps, SuggestionProps } from "@/types";
-import { debounce } from "@/utils/functions";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+
+import CustomButton from "@/components/CustomButton";
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import Suggestion from "@/components/Suggestion";
+import SuggestionGroup from "@/components/SuggestionGroup";
+import Colors from "@/constants/colors";
+import { api } from "@/convex/_generated/api";
+import styles from "@/styles/search.styles";
+import { GroupProps, SuggestionProps } from "@/types";
+import { debounce } from "@/utils/functions";
 
 const SearchScreen: React.FC = () => {
   const [result, setResult] = useState<GroupProps | SuggestionProps | null>(
@@ -27,19 +23,16 @@ const SearchScreen: React.FC = () => {
   );
   const [searchPhrase, setSearchPhrase] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [joining, setJoining] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
-
   const { userId } = useAuth();
 
-  // Existing mutations for searching
   const searchGroupsMutation = useMutation(
     api.suggestion.searchGroupsByInvitationCode
   );
   const searchSuggestionsMutation = useMutation(
     api.suggestion.searchSuggestionsByInvitationCode
   );
-
-  // New mutations for requesting to join
   const requestGroupJoinMutation = useMutation(
     api.suggestion.requestToJoinGroup
   );
@@ -49,7 +42,6 @@ const SearchScreen: React.FC = () => {
 
   const handleSearch = useCallback(async () => {
     const trimmed = searchPhrase.trim();
-
     const isGroup = trimmed.startsWith("grp") && trimmed.endsWith("G0g");
     const isSuggestion = trimmed.startsWith("sug") && trimmed.endsWith("S0s");
 
@@ -86,11 +78,10 @@ const SearchScreen: React.FC = () => {
     userId ? { clerkId: userId } : "skip"
   );
 
-  // Handler for join button press
   const handleRequestToJoin = async () => {
-    if (!result || !userId) return;
+    if (!result || !userId || joining) return;
     try {
-      // Use the invitationCode from the result record
+      setJoining(true);
       if (resultType === "group") {
         await requestGroupJoinMutation({
           invitationCode: (result as GroupProps).invitationCode,
@@ -100,44 +91,19 @@ const SearchScreen: React.FC = () => {
           invitationCode: (result as SuggestionProps).invitationCode,
         });
       }
-
       setSearchPhrase("");
       setResult(null);
       setResultType(null);
       router.back();
     } catch (err) {
       console.error("Request failed", err);
+    } finally {
+      setJoining(false);
     }
   };
 
-  useEffect(() => {
-    const getCopiedText = async () => {
-      try {
-        const copiedText = await Clipboard.getString();
-
-        console.log("Clipboard content:", copiedText);
-
-        if (!copiedText) return;
-
-        const isGroup =
-          copiedText.startsWith("grp") && copiedText.endsWith("G0g");
-        const isSuggestion =
-          copiedText.startsWith("sug") && copiedText.endsWith("S0s");
-
-        if (!isGroup || !isSuggestion) {
-          return;
-        }
-        setSearchPhrase(copiedText);
-      } catch (error) {
-        console.log("Failed to get clipboard content:", error);
-      }
-    };
-    getCopiedText();
-  }, []);
-
   return (
     <View style={styles.container}>
-      {/* Search Input */}
       <View style={styles.header}>
         <View style={styles.searchRow}>
           <TextInput
@@ -161,7 +127,11 @@ const SearchScreen: React.FC = () => {
               style={styles.iconWrapper}
               activeOpacity={0.8}
             >
-              <Ionicons name="close-circle" size={22} color={Colors.error} />
+              <Ionicons
+                name="close-circle"
+                size={22}
+                color={Colors.placeholderText}
+              />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -172,31 +142,13 @@ const SearchScreen: React.FC = () => {
             <Ionicons name="search" size={22} color={Colors.primary} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.primary,
-            padding: 10,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 5,
-            borderRadius: 5,
-          }}
-          activeOpacity={0.8}
+        <CustomButton
+          text="paste from clipboard"
           onPress={() => Clipboard.getString().then(setSearchPhrase)}
-        >
-          <Text
-            style={{
-              color: Colors.white,
-              fontSize: 14,
-              fontFamily: Fonts.Regular,
-            }}
-          >
-            paste from clipboard
-          </Text>
-        </TouchableOpacity>
+          style={styles.pasteButton}
+        />
       </View>
 
-      {/* Search Results */}
       <View style={styles.resultsContainer}>
         {loading ? (
           <Loader />
@@ -208,17 +160,17 @@ const SearchScreen: React.FC = () => {
             ) : (
               <Suggestion item={result as SuggestionProps} userId={userId} />
             )}
-            {/* Show join button only if the current user is not the owner */}
+
             {currentUser?._id !== result.userId && (
-              <View style={styles.footerContainer}>
-                <TouchableOpacity
-                  style={styles.joinButton}
-                  activeOpacity={0.8}
-                  onPress={handleRequestToJoin}
-                >
-                  <Text style={styles.joinButtonText}>Request To Join</Text>
-                </TouchableOpacity>
-              </View>
+              <CustomButton
+                text="Join"
+                onPress={handleRequestToJoin}
+                style={[
+                  styles.pasteButton,
+                  { backgroundColor: Colors.invited },
+                ]}
+                loading={joining}
+              />
             )}
           </>
         ) : (
@@ -230,69 +182,3 @@ const SearchScreen: React.FC = () => {
 };
 
 export default SearchScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 15,
-  },
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.lightGray[300],
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    height: 50,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.textDark,
-    paddingVertical: 10,
-  },
-  iconWrapper: {
-    padding: 5,
-  },
-  resultsContainer: {
-    flex: 1,
-    padding: 15,
-  },
-  resultHeader: {
-    fontSize: 20,
-    color: Colors.textDark,
-    fontFamily: Fonts.Bold,
-    marginBottom: 5,
-  },
-  footerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  joinButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.primary,
-    borderRadius: 5,
-    width: "100%",
-    padding: 15,
-  },
-  joinButtonText: {
-    color: Colors.white,
-    fontSize: 16,
-    fontFamily: Fonts.Medium,
-  },
-  pasteButton: {
-    marginTop: 10,
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#007bff",
-    borderRadius: 5,
-  },
-  pasteButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-});

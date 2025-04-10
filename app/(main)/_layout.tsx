@@ -25,16 +25,6 @@ const MainLayout = () => {
           headerTitleAlign: "center",
         }}
       />
-
-      <Stack.Screen
-        name="settings"
-        options={{
-          presentation: "modal",
-          animation: "slide_from_bottom",
-          title: "Manage Settings",
-          headerTitleAlign: "center",
-        }}
-      />
       <Stack.Screen
         name="groupDetails"
         options={{

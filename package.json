@@ -3,8 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "build:android": "eas build --platform android --profile preview",
-    "publish:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
+    "publish:android": "eas build --platform android --profile preview",
+    "update:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
     "upgrade": "bun install expo@latest && bunx expo install --fix",
     "android": "bunx expo run:android --device",
     "build:web": "npx expo export --platform web",

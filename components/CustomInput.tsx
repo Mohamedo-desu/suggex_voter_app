@@ -1,6 +1,5 @@
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/Fonts";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { FC } from "react";
 import {
   NativeSyntheticEvent,
@@ -11,17 +10,14 @@ import {
   TextInputFocusEventData,
   TextInputProps,
   TextStyle,
-  TouchableOpacity,
   View,
 } from "react-native";
 
 interface CustomInputProps extends TextInputProps {
   placeholder: string;
-  rightIcon?: string;
   errors?: string;
   touched?: boolean;
   value: string;
-  onPressRightIcon?: () => void;
   handleChange: (value: string) => void;
   handleBlur?: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   style?: StyleProp<TextStyle>;
@@ -29,18 +25,15 @@ interface CustomInputProps extends TextInputProps {
 
 const CustomInput: FC<CustomInputProps> = ({
   placeholder,
-  rightIcon,
   errors,
   touched,
   value,
   handleChange,
   handleBlur,
-  onPressRightIcon,
   style,
   autoComplete,
   maxLength,
   keyboardType = "default",
-  secureTextEntry = false,
   ...rest
 }) => {
   return (
@@ -51,29 +44,12 @@ const CustomInput: FC<CustomInputProps> = ({
           onChangeText={handleChange}
           onBlur={handleBlur}
           keyboardType={keyboardType}
-          autoCapitalize="none"
           cursorColor={Colors.primary}
-          autoComplete={autoComplete}
-          maxLength={maxLength}
-          numberOfLines={1}
           placeholder={placeholder}
           style={[styles.input, style]}
           placeholderTextColor={Colors.placeholderText}
-          secureTextEntry={secureTextEntry}
           {...rest}
         />
-        {rightIcon && (
-          <TouchableOpacity
-            onPress={onPressRightIcon}
-            style={styles.rightIconContainer}
-          >
-            <MaterialCommunityIcons
-              name={rightIcon}
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-        )}
       </View>
       {errors && touched && <Text style={styles.error}>{errors}</Text>}
     </>

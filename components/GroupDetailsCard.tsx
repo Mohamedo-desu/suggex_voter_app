@@ -94,7 +94,6 @@ const GroupDetailsCard = ({
     setEditedGroup((prev) => ({ ...prev, invitationCode }));
   };
 
-  // Setup BottomSheet
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["90%"], []);
   const openEditSheet = () => {

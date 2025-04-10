@@ -1,3 +1,12 @@
+import Comment from "@/components/Comment";
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import SuggestionDetailsCard from "@/components/SuggestionDetailsCard";
+import Colors from "@/constants/colors";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import styles from "@/styles/suggestionDetails.styles";
+import { CommentProps, SuggestionProps } from "@/types";
 import { useAuth } from "@clerk/clerk-expo";
 import { useMutation, useQuery } from "convex/react";
 import { router, useLocalSearchParams } from "expo-router";
@@ -10,16 +19,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import Comment from "@/components/Comment";
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import SuggestionDetailsCard from "@/components/SuggestionDetailsCard";
-import Colors from "@/constants/colors";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import styles from "@/styles/suggestionDetails.styles";
-import { CommentProps, SuggestionProps } from "@/types";
 
 const SuggestionDetails: FC = () => {
   const { suggestionId } = useLocalSearchParams();
@@ -40,8 +39,6 @@ const SuggestionDetails: FC = () => {
     api.user.getUserByClerkId,
     userId ? { clerkId: userId } : "skip"
   );
-
-  // If the suggestion is closed and the current user is not the owner, navigate back.
   useEffect(() => {
     if (
       suggestionDetails &&
@@ -72,16 +69,18 @@ const SuggestionDetails: FC = () => {
     return <Loader />;
   }
 
-  const renderComment = ({ item }: { item: CommentProps }) => (
-    <Comment item={item} userId={userId} />
-  );
-
+  const renderComment = ({ item }: { item: CommentProps }) => {
+    if (!userId) return null;
+    return <Comment item={item} userId={userId} />;
+  };
   const isOwner = suggestionDetails.userId === currentUser?._id;
   const showCommentInput = suggestionDetails.status === "open";
 
   return (
     <>
-      <SuggestionDetailsCard item={suggestionDetails} userId={userId} />
+      {userId && (
+        <SuggestionDetailsCard item={suggestionDetails} userId={userId} />
+      )}
       {isOwner ? (
         <>
           {showCommentInput && (

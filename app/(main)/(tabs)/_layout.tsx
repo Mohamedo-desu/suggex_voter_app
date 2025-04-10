@@ -10,7 +10,6 @@ const TabsLayout = () => {
   return (
     <Tabs
       screenOptions={{
-        headerShown: true,
         tabBarShowLabel: false,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.placeholderText,
@@ -30,7 +29,7 @@ const TabsLayout = () => {
               style={{ marginRight: 15 }}
               activeOpacity={0.8}
               hitSlop={10}
-              onPress={() => router.navigate("/create")}
+              onPress={() => router.push("/create")}
               {...props}
             >
               <Ionicons
@@ -48,7 +47,7 @@ const TabsLayout = () => {
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
-          title: "Search Suggestion Or Group",
+          title: "Search",
           headerTitleAlign: "center",
         }}
       />
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderTopWidth: 0,
     position: "absolute",
-    elevation: 0,
+    elevation: 10,
     height: 40,
     paddingBottom: 8,
   },

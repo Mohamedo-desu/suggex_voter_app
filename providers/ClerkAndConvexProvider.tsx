@@ -4,15 +4,9 @@ import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ReactNode } from "react";
 
-const publishableKey =
-  process.env.EXPO_PUBLIC_APP_ENV === "production"
-    ? process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_PROD_KEY!
-    : process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
-const convexKey =
-  process.env.EXPO_PUBLIC_APP_ENV === "production"
-    ? process.env.EXPO_PUBLIC_CONVEX_PROD_URL!
-    : process.env.EXPO_PUBLIC_CONVEX_URL!;
+const convexKey = process.env.EXPO_PUBLIC_CONVEX_URL!;
 
 if (!publishableKey) {
   throw new Error(

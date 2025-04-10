@@ -2,16 +2,15 @@ import Empty from "@/components/Empty";
 import GroupDetailsCard from "@/components/GroupDetailsCard";
 import Loader from "@/components/Loader";
 import Suggestion from "@/components/Suggestion";
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { styles } from "@/styles/groupDetails.styles";
 import { GroupProps, SuggestionProps } from "@/types";
 import { useAuth } from "@clerk/clerk-expo";
 import { useQuery } from "convex/react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { FC, useEffect } from "react";
-import { FlatList, StyleSheet, Text } from "react-native";
+import { FlatList, Text } from "react-native";
 
 const GroupDetails: FC = () => {
   const { groupId } = useLocalSearchParams();
@@ -23,22 +22,20 @@ const GroupDetails: FC = () => {
     userId ? { clerkId: userId } : "skip"
   );
 
-  // Query group suggestions.
   const suggestions = useQuery(api.suggestion.fetchSuggestions, {
     groupId: groupId as Id<"groups">,
   }) as SuggestionProps[];
 
-  // Query group details.
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {
     groupId: groupId as Id<"groups">,
   }) as GroupProps;
 
-  // Render each suggestion item.
-  const renderItem = ({ item }: { item: SuggestionProps }) => (
-    <Suggestion item={item} userId={userId} />
-  );
+  const renderItem = ({ item }: { item: SuggestionProps }) => {
+    if (!userId) return null;
 
-  // Navigate back automatically if the group is inactive.
+    return <Suggestion item={item} userId={userId} />;
+  };
+
   useEffect(() => {
     if (!groupDetails) {
       return;
@@ -53,7 +50,6 @@ const GroupDetails: FC = () => {
   }, [groupDetails, router, userId]);
 
   useEffect(() => {
-    // Check for deleted (or non-existent) group.
     if (groupDetails !== undefined && !groupDetails) {
       router.back();
     }
@@ -63,7 +59,7 @@ const GroupDetails: FC = () => {
 
   return (
     <>
-      <GroupDetailsCard item={groupDetails} userId={userId} />
+      {userId && <GroupDetailsCard item={groupDetails} userId={userId} />}
 
       <FlatList
         data={suggestions}
@@ -82,16 +78,3 @@ const GroupDetails: FC = () => {
 };
 
 export default GroupDetails;
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    padding: 15,
-    gap: 10,
-  },
-
-  resultHeader: {
-    fontSize: 16,
-    color: Colors.textDark,
-    fontFamily: Fonts.Bold,
-  },
-});

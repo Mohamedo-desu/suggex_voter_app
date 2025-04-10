@@ -1,6 +1,6 @@
 import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
+import { styles } from "@/styles/suggestionGroup.styles";
 import { GroupProps } from "@/types";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
@@ -9,7 +9,6 @@ import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import {
   StyleProp,
-  StyleSheet,
   Text,
   TextStyle,
   TouchableOpacity,
@@ -129,57 +128,3 @@ const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
 };
 
 export default SuggestionGroup;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.background,
-    borderRadius: 5,
-    elevation: 2,
-    justifyContent: "center",
-    height: 80,
-    paddingHorizontal: 15,
-    borderBottomWidth: 3,
-    gap: 10,
-  },
-  iconContainer: {
-    position: "absolute",
-    right: -3,
-    top: -6,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  groupNameText: {
-    fontSize: 20,
-    fontFamily: Fonts.Bold,
-    color: Colors.textDark,
-    flex: 1,
-  },
-  timeText: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.placeholderText,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  statItemContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
-    color: Colors.placeholderText,
-  },
-  statNumber: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
-    color: Colors.primary,
-  },
-});

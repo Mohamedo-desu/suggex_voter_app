@@ -1,6 +1,6 @@
 import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
+import { styles } from "@/styles/comment.styles";
 import { CommentProps } from "@/types";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Platform,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -51,14 +50,8 @@ const Comment = ({ item, userId }: CommentItemProps) => {
   return (
     <>
       <View style={styles.commentContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={styles.headerContainer}>
+          <View style={styles.header}>
             <Text style={styles.commentAuthor}>Anonymous</Text>
             <Text style={styles.commentAuthor}>
               {" "}
@@ -110,22 +103,3 @@ const Comment = ({ item, userId }: CommentItemProps) => {
 };
 
 export default Comment;
-
-const styles = StyleSheet.create({
-  commentContainer: {
-    padding: 10,
-    backgroundColor: Colors.background,
-    borderRadius: 5,
-  },
-  commentAuthor: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
-    color: Colors.primary,
-    marginBottom: 5,
-  },
-  commentText: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
-    color: Colors.textDark,
-  },
-});

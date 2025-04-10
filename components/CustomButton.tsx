@@ -14,7 +14,7 @@ interface CustomButtonProps {
   text: string;
   onPress: () => void;
   loading?: boolean;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle;
 }
 
@@ -46,16 +46,15 @@ export default CustomButton;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.primary,
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    width: "100%",
-    height: 60,
+    padding: 10,
   },
   buttonText: {
     textAlign: "center",
-    color: "white",
-    fontSize: 18,
+    color: Colors.white,
+    fontSize: 16,
     fontFamily: Fonts.Medium,
   },
 });

@@ -1,4 +1,3 @@
-import Colors from "@/constants/colors";
 import { useAuth } from "@clerk/clerk-expo";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack, useRouter, useSegments } from "expo-router";
@@ -29,10 +28,6 @@ const InitialLayout = () => {
       <Stack
         screenOptions={{
           headerShown: false,
-          sceneStyle: {
-            backgroundColor: Colors.background,
-          },
-          tabBarHideOnKeyboard: true,
         }}
       />
     </ThemeProvider>

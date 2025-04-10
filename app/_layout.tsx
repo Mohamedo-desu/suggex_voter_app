@@ -57,7 +57,7 @@ Sentry.init({
   attachScreenshot: true,
   attachStacktrace: true,
   enableAutoPerformanceTracing: true,
-  enableNative: false,
+  enableNative: true,
 });
 
 const scope = Sentry.getGlobalScope();

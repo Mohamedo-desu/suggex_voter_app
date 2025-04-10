@@ -9,12 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 
 const SuggestionsScreen = () => {
@@ -33,6 +28,7 @@ const SuggestionsScreen = () => {
   };
 
   const renderItem = ({ item }: { item: GroupProps }) => {
+    if (!userId) return null;
     return <SuggestionGroup item={item} userId={userId} />;
   };
   const navigation = useNavigation();
@@ -46,7 +42,11 @@ const SuggestionsScreen = () => {
           hitSlop={10}
           onPress={() => setShowAlert(true)}
         >
-          <Ionicons name="log-out-outline" size={25} color={Colors.primary} />
+          <Ionicons
+            name="log-out-outline"
+            size={25}
+            color={Colors.placeholderText}
+          />
         </TouchableOpacity>
       ),
     });
@@ -72,7 +72,7 @@ const SuggestionsScreen = () => {
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
         contentContainerStyle={{ flexGrow: 1, padding: 15, gap: 10 }}
-        ListEmptyComponent={<Empty text="No groups found" />}
+        ListEmptyComponent={<Empty text="No suggestion groups found!" />}
       />
       <AwesomeAlert
         show={showAlert}
@@ -94,5 +94,3 @@ const SuggestionsScreen = () => {
 };
 
 export default SuggestionsScreen;
-
-const styles = StyleSheet.create({});
