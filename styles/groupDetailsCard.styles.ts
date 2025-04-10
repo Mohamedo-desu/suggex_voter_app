@@ -5,10 +5,8 @@ import { Platform, StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   listHeaderContainer: {
     backgroundColor: Colors.background,
-    elevation: 5,
     padding: 10,
     marginTop: 5,
-    zIndex: 10,
   },
   headerContainer: {
     justifyContent: "space-between",
@@ -81,11 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: Colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     padding: 20,
-    minHeight: 400,
   },
   modalHeader: {
     flexDirection: "row",

@@ -75,6 +75,7 @@ const GroupDetails: FC = () => {
         ListHeaderComponent={
           <Text style={styles.resultHeader}>Suggestions</Text>
         }
+        style={{ zIndex: -1 }}
       />
     </>
   );

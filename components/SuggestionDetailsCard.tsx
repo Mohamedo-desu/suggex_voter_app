@@ -75,8 +75,6 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
 
   const handleSaveProfile = async () => {
     try {
-      console.log(editedSuggestion);
-
       await editSuggestion({
         suggestionId: item?._id as Id<"suggestions">,
         invitationCode: editedSuggestion.invitationCode,
@@ -129,12 +127,11 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
 
   const closeEditSheet = () => {
     bottomSheetRef.current?.close();
-    console.log(item?.endGoal);
 
     setEditedSuggestion({
       invitationCode: item?.invitationCode,
       status: item?.status,
-      endGoal: item?.endGoal,
+      endGoal: item?.endGoal.toString(),
     });
   };
 
@@ -317,7 +314,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
                 </TouchableOpacity>
               </View>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { height: 70 }]}
                 value={editedSuggestion.invitationCode}
                 onChangeText={(text) =>
                   setEditedSuggestion((prev) => ({
@@ -327,6 +324,8 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
                 }
                 placeholderTextColor={Colors.placeholderText}
                 editable={false}
+                textAlignVertical="top"
+                multiline
               />
             </View>
 
