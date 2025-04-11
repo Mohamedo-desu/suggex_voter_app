@@ -102,6 +102,22 @@ const SearchScreen: React.FC = () => {
     }
   };
 
+  const handlePaste = async () => {
+    const copiedText = await Clipboard.getString();
+
+    console.log(copiedText);
+
+    const isGroup = copiedText.startsWith("grp") && copiedText.endsWith("G0g");
+    const isSuggestion =
+      copiedText.startsWith("sug") && copiedText.endsWith("S0s");
+
+    if (!isGroup && !isSuggestion) {
+      alert("Please paste the correct invitation code");
+      return;
+    }
+
+    setSearchPhrase(copiedText);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -144,7 +160,7 @@ const SearchScreen: React.FC = () => {
         </View>
         <CustomButton
           text="paste from clipboard"
-          onPress={() => Clipboard.getString().then(setSearchPhrase)}
+          onPress={handlePaste}
           style={styles.pasteButton}
         />
       </View>

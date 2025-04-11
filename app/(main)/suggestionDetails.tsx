@@ -1,4 +1,5 @@
 import Comment from "@/components/Comment";
+import CustomButton from "@/components/CustomButton";
 import Empty from "@/components/Empty";
 import Loader from "@/components/Loader";
 import SuggestionDetailsCard from "@/components/SuggestionDetailsCard";
@@ -11,14 +12,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useMutation, useQuery } from "convex/react";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { FC, useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Text, TextInput, View } from "react-native";
 
 const SuggestionDetails: FC = () => {
   const { suggestionId } = useLocalSearchParams();
@@ -95,18 +89,12 @@ const SuggestionDetails: FC = () => {
                 multiline
                 maxLength={300}
               />
-              <TouchableOpacity
+
+              <CustomButton
+                text="Post"
+                loading={addingComment}
                 onPress={handleAddComment}
-                disabled={!newComment.trim() || addingComment}
-                style={styles.commentButton}
-                activeOpacity={0.8}
-              >
-                {addingComment ? (
-                  <ActivityIndicator size="small" color={Colors.white} />
-                ) : (
-                  <Text style={styles.commentButtonText}>Post</Text>
-                )}
-              </TouchableOpacity>
+              />
             </View>
           )}
           <FlatList
@@ -137,18 +125,12 @@ const SuggestionDetails: FC = () => {
                   multiline
                   maxLength={300}
                 />
-                <TouchableOpacity
+
+                <CustomButton
+                  text="Post"
+                  loading={addingComment}
                   onPress={handleAddComment}
-                  disabled={!newComment.trim() || addingComment}
-                  style={styles.commentButton}
-                  activeOpacity={0.8}
-                >
-                  {addingComment ? (
-                    <ActivityIndicator size="small" color={Colors.white} />
-                  ) : (
-                    <Text style={styles.commentButtonText}>Post</Text>
-                  )}
-                </TouchableOpacity>
+                />
               </View>
               <FlatList
                 data={comments}

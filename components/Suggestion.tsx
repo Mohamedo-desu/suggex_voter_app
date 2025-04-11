@@ -1,18 +1,17 @@
 import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
 import { api } from "@/convex/_generated/api";
 import { styles } from "@/styles/suggestionCard.styles";
 import { SuggestionProps } from "@/types";
-import {
-  FontAwesome5,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { router } from "expo-router";
 import React, { FC, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Text,
   TextStyle,
   TouchableOpacity,
@@ -68,6 +67,29 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
     }
   };
 
+  const onPressDelete = () => {
+    if (Platform.OS === "web") {
+      setShowAlert(true);
+    } else {
+      Alert.alert(
+        "Delete",
+        "Are you sure you want to delete this suggestion? This action cannot be undone",
+        [
+          {
+            text: "No, cancel",
+            onPress: undefined,
+            style: "cancel",
+          },
+          {
+            text: "Yes, delete",
+            onPress: () => handleDelete(),
+            style: "destructive",
+          },
+        ]
+      );
+    }
+  };
+
   const displayName: string = useMemo(() => {
     return item?.title.length > 25
       ? item?.title.slice(0, 25) + "..."
@@ -76,10 +98,10 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
 
   const containerStyle = useMemo(
     () => [
-      styles.container,
       item?.status === "rejected" && styles.rejected,
       item?.status === "approved" && styles.approved,
-      isClosed && !isOwner && styles.closed,
+      item?.status === "open" && styles.open,
+      isClosed && styles.closed,
       isPrivate && styles.private,
     ],
     [item?.status, isClosed, isPrivate]
@@ -104,85 +126,115 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   }));
 
   return (
-    <TouchableOpacity
-      style={containerStyle}
-      activeOpacity={0.8}
-      disabled={isOwner ? false : isClosed || isPrivate}
-      onPress={() =>
-        router.navigate({
-          pathname: "/(main)/suggestionDetails",
-          params: { suggestionId: item?._id },
-        })
-      }
-    >
-      <View style={styles.iconContainer}>
-        <MaterialCommunityIcons
-          name={isPrivate ? "lock" : "newspaper-variant"}
-          size={15}
-          color={Colors.placeholderText}
-        />
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {displayName}
-        </Text>
-        <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
-          {item?.description}
-        </Text>
-        {isOwner && (
-          <View style={styles.actionButtons}>
-            {deleting ? (
-              <ActivityIndicator size={"small"} color={Colors.error} />
-            ) : (
-              <TouchableOpacity
-                onPress={() => setShowAlert(true)}
-                style={styles.deleteButton}
-                disabled={isClosed}
-              >
-                <FontAwesome5 name="trash" size={15} color={Colors.error} />
-              </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        style={[styles.container, { opacity: isClosed && !isOwner ? 0.5 : 1 }]}
+        activeOpacity={0.8}
+        disabled={isOwner ? false : isClosed || isPrivate}
+        onPress={() =>
+          router.navigate({
+            pathname: "/(main)/suggestionDetails",
+            params: { suggestionId: item?._id },
+          })
+        }
+      >
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons
+            name={isPrivate ? "lock" : "newspaper-variant"}
+            size={15}
+            color={Colors.placeholderText}
+          />
+        </View>
+        <View style={styles.content}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+              {displayName}
+            </Text>
+            {isOwner && (
+              <View style={styles.actionButtons}>
+                {deleting ? (
+                  <ActivityIndicator size={"small"} color={Colors.error} />
+                ) : (
+                  <TouchableOpacity
+                    onPress={onPressDelete}
+                    style={styles.deleteButton}
+                    disabled={isClosed}
+                  >
+                    <MaterialCommunityIcons
+                      name="delete-forever-outline"
+                      size={20}
+                      color={Colors.error}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           </View>
-        )}
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoText}>{creationTimeFormatted}</Text>
-        <View style={styles.statsContainer}>
-          {[
-            { label: "upvotes", count: item?.likesCount },
-            { label: "comments", count: item?.commentsCount },
-          ].map(({ label, count }) => (
-            <View key={label} style={styles.statItemContainer}>
-              <Text style={styles.statLabel}>{label} : </Text>
-              {isPrivate ? (
-                <Ionicons
-                  name="eye-off"
-                  size={14}
-                  color={Colors.lightGray[500]}
-                />
-              ) : (
-                <AnimatedNumber
-                  animateToNumber={count}
-                  animationDuration={1000}
-                  fontStyle={styles.statNumber as TextStyle}
-                  includeComma={true}
-                />
-              )}
-            </View>
-          ))}
-        </View>
-      </View>
 
-      {!isPrivate && (
-        <View style={styles.progressWrapper}>
-          <View style={styles.progressBarContainer}>
-            <Animated.View
-              style={[styles.progressBarFill, progressAnimatedStyle]}
-            />
-          </View>
-          <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+          <Text
+            style={styles.description}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {item?.description}
+          </Text>
         </View>
-      )}
+        <View style={styles.infoRow}>
+          <Text style={styles.infoText}>{creationTimeFormatted}</Text>
+          <View style={styles.statsContainer}>
+            {[
+              { label: "upvotes", count: item?.likesCount },
+              { label: "comments", count: item?.commentsCount },
+            ].map(({ label, count }) => (
+              <View key={label} style={styles.statItemContainer}>
+                <Text style={styles.statLabel}>{label} : </Text>
+                {isPrivate ? (
+                  <Ionicons
+                    name="eye-off"
+                    size={14}
+                    color={Colors.lightGray[500]}
+                  />
+                ) : (
+                  <AnimatedNumber
+                    animateToNumber={count}
+                    animationDuration={1000}
+                    fontStyle={styles.statNumber as TextStyle}
+                    includeComma={true}
+                  />
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {!isPrivate && (
+          <View style={styles.progressWrapper}>
+            <View style={styles.progressBarContainer}>
+              <Animated.View
+                style={[styles.progressBarFill, progressAnimatedStyle]}
+              />
+            </View>
+            <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+      <View style={containerStyle}>
+        <Text
+          style={{
+            fontSize: 12,
+            fontFamily: Fonts.Regular,
+            color: Colors.white,
+          }}
+        >
+          {item?.status === "open" ? "Active" : item?.status}
+        </Text>
+      </View>
       <AwesomeAlert
         show={showAlert}
         showProgress={false}
@@ -198,7 +250,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
         onCancelPressed={() => setShowAlert(false)}
         onConfirmPressed={() => handleDelete()}
       />
-    </TouchableOpacity>
+    </>
   );
 };
 

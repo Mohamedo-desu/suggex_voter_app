@@ -10,7 +10,7 @@ import {
 } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetView,
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { Picker } from "@react-native-picker/picker";
@@ -19,7 +19,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { router } from "expo-router";
 import { nanoid } from "nanoid/non-secure";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, Text, TouchableOpacity, View } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
 import Animated, {
@@ -27,6 +27,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import CustomButton from "./CustomButton";
+import CustomInput from "./CustomInput";
 
 interface SuggestionDetailsCardProps {
   item: SuggestionProps;
@@ -70,6 +72,28 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
       router.back();
     } catch (error) {
       console.error("Failed to delete suggestion:", error);
+    }
+  };
+  const onPressDelete = () => {
+    if (Platform.OS === "web") {
+      setShowAlert(true);
+    } else {
+      Alert.alert(
+        "Delete",
+        "Are you sure you want to delete this suggestion? This action cannot be undone",
+        [
+          {
+            text: "No, cancel",
+            onPress: undefined,
+            style: "cancel",
+          },
+          {
+            text: "Yes, delete",
+            onPress: () => handleDelete(),
+            style: "destructive",
+          },
+        ]
+      );
     }
   };
 
@@ -122,7 +146,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   const snapPoints = useMemo(() => ["90%"], []);
 
   const openEditSheet = () => {
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.expand();
   };
 
   const closeEditSheet = () => {
@@ -134,6 +158,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
       endGoal: item?.endGoal.toString(),
     });
   };
+  const isActive = item?.status === "open";
 
   return (
     <>
@@ -147,25 +172,43 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
               <TouchableOpacity onPress={openEditSheet} activeOpacity={0.8}>
                 <MaterialCommunityIcons
                   name="file-edit-outline"
-                  size={24}
+                  size={20}
                   color={Colors.invited}
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => setShowAlert(true)}
+                onPress={onPressDelete}
                 style={styles.actionButton}
                 disabled={isClosed}
               >
                 <MaterialCommunityIcons
                   name="delete-forever-outline"
-                  size={24}
+                  size={20}
                   color={Colors.error}
                 />
               </TouchableOpacity>
             </View>
           )}
         </View>
-
+        <Text
+          style={[
+            styles.groupStatusText,
+            {
+              color:
+                isActive || item?.status === "approved"
+                  ? Colors.primary
+                  : Colors.error,
+            },
+          ]}
+        >
+          {item?.status === "open"
+            ? "Active"
+            : item?.status === "closed"
+              ? "Inactive"
+              : item?.status === "approved"
+                ? "Approved"
+                : "Rejected"}
+        </Text>
         <Text style={styles.description}>{item?.description}</Text>
 
         <View style={styles.detailRow}>
@@ -176,7 +219,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Invitation Code: </Text>
           <Text style={styles.detailValue}>
-            {item?.invitationCode.substring(0, 20)}...
+            {item?.invitationCode.substring(0, 15)}...
           </Text>
           <TouchableOpacity
             style={styles.copyButton}
@@ -226,22 +269,6 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
             <Text style={styles.progressText}>{Math.round(progress)}%</Text>
           </View>
         </View>
-
-        <AwesomeAlert
-          show={showAlert}
-          showProgress={false}
-          title="Delete"
-          message="Are you sure you want to delete this suggestion? This action cannot be undone"
-          closeOnTouchOutside={false}
-          closeOnHardwareBackPress={false}
-          showCancelButton
-          showConfirmButton
-          cancelText="No, cancel"
-          confirmText="Yes, delete"
-          confirmButtonColor={Colors.error}
-          onCancelPressed={() => setShowAlert(false)}
-          onConfirmPressed={handleDelete}
-        />
       </View>
 
       <BottomSheet
@@ -257,87 +284,113 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
             onPress={closeEditSheet}
           />
         )}
+        handleIndicatorStyle={{ backgroundColor: Colors.primary }}
       >
-        <BottomSheetView>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Suggestion</Text>
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Status</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={editedSuggestion.status}
-                  onValueChange={(itemValue) =>
-                    setEditedSuggestion((prev) => ({
-                      ...prev,
-                      status: itemValue,
-                    }))
-                  }
-                >
-                  <Picker.Item label="open" value="open" />
-                  <Picker.Item label="Approved" value="approved" />
-                  <Picker.Item label="Rejected" value="rejected" />
-                  <Picker.Item label="Closed" value="closed" />
-                </Picker>
-              </View>
-            </View>
-            {item.status === "open" && (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  End Goal for this Suggestion
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  value={editedSuggestion.endGoal}
-                  onChangeText={(text) =>
-                    setEditedSuggestion((prev) => ({
-                      ...prev,
-                      endGoal: text,
-                    }))
-                  }
-                  placeholderTextColor={Colors.placeholderText}
-                />
-              </View>
-            )}
-            <View style={styles.inputContainer}>
-              <View style={styles.invitationRow}>
-                <Text style={styles.inputLabel}>Invitation Code</Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={generateNewInvitation}
-                >
-                  <Text style={[styles.inputLabel, { color: Colors.primary }]}>
-                    Generate New
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <TextInput
-                style={[styles.input, { height: 70 }]}
-                value={editedSuggestion.invitationCode}
-                onChangeText={(text) =>
+        <BottomSheetScrollView contentContainerStyle={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Edit Suggestion</Text>
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Status</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={editedSuggestion.status}
+                onValueChange={(itemValue) =>
                   setEditedSuggestion((prev) => ({
                     ...prev,
-                    invitationCode: text,
+                    status: itemValue,
+                  }))
+                }
+              >
+                <Picker.Item
+                  label="open"
+                  value="open"
+                  style={styles.inputLabel}
+                />
+                <Picker.Item
+                  label="Approved"
+                  value="approved"
+                  style={styles.inputLabel}
+                />
+                <Picker.Item
+                  label="Rejected"
+                  value="rejected"
+                  style={styles.inputLabel}
+                />
+                <Picker.Item
+                  label="Closed"
+                  value="closed"
+                  style={styles.inputLabel}
+                />
+              </Picker>
+            </View>
+          </View>
+          {item.status === "open" && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                End Goal for this Suggestion
+              </Text>
+              <CustomInput
+                placeholder="group name"
+                value={editedSuggestion.endGoal}
+                handleChange={(text) =>
+                  setEditedSuggestion((prev) => ({
+                    ...prev,
+                    endGoal: text,
                   }))
                 }
                 placeholderTextColor={Colors.placeholderText}
-                editable={false}
-                textAlignVertical="top"
-                multiline
               />
             </View>
+          )}
+          <View style={styles.inputContainer}>
+            <View style={styles.invitationRow}>
+              <Text style={styles.inputLabel}>Invitation Code</Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={generateNewInvitation}
+              >
+                <Text style={[styles.inputLabel, { color: Colors.primary }]}>
+                  Generate New
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveProfile}
-            >
-              <Text style={styles.saveButtonText}>Save Changes</Text>
-            </TouchableOpacity>
+            <CustomInput
+              placeholder="Invitation Code"
+              style={[{ height: 40 }]}
+              value={editedSuggestion.invitationCode}
+              handleChange={(text) =>
+                setEditedSuggestion((prev) => ({
+                  ...prev,
+                  invitationCode: text,
+                }))
+              }
+              placeholderTextColor={Colors.placeholderText}
+              editable={false}
+              textAlignVertical="top"
+              multiline
+            />
           </View>
-        </BottomSheetView>
+
+          <CustomButton text="Save Changes" onPress={handleSaveProfile} />
+        </BottomSheetScrollView>
       </BottomSheet>
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Delete"
+        message="Are you sure you want to delete this suggestion? This action cannot be undone"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton
+        showConfirmButton
+        cancelText="No, cancel"
+        confirmText="Yes, delete"
+        confirmButtonColor={Colors.error}
+        onCancelPressed={() => setShowAlert(false)}
+        onConfirmPressed={handleDelete}
+      />
     </>
   );
 };

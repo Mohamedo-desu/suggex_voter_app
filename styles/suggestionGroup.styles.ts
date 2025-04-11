@@ -6,11 +6,10 @@ export const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
     borderRadius: 5,
-    elevation: 2,
+    elevation: 0,
     justifyContent: "center",
     height: 80,
     paddingHorizontal: 15,
-    borderBottomWidth: 3,
     gap: 10,
   },
   iconContainer: {
@@ -22,15 +21,16 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 15,
   },
   groupNameText: {
-    fontSize: 20,
+    fontSize: 14,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
     flex: 1,
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
   },
@@ -40,18 +40,17 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   statItemContainer: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
   },
   statLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
   },
   statNumber: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.primary,
   },
 });

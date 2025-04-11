@@ -78,9 +78,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-font",
         {
           fonts: [
-            "./assets/fonts/Okra-Bold.ttf",
-            "./assets/fonts/Okra-Medium.ttf",
-            "./assets/fonts/Okra-Regular.ttf",
+            "./assets/fonts/Poppins-Bold.ttf",
+            "./assets/fonts/Poppins-Medium.ttf",
+            "./assets/fonts/Poppins-Regular.ttf",
           ],
         },
       ],

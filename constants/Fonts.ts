@@ -1,5 +1,11 @@
+export const fonts = {
+  Bold: require("@/assets/fonts/Poppins-Bold.ttf"),
+  Medium: require("@/assets/fonts/Poppins-Medium.ttf"),
+  Regular: require("@/assets/fonts/Poppins-Regular.ttf"),
+};
+
 export enum Fonts {
-  Bold = "Okra-Bold",
-  Medium = "Okra-Medium",
-  Regular = "Okra-Regular",
+  Bold = "Poppins-Bold",
+  Medium = "Poppins-Medium",
+  Regular = "Poppins-Regular",
 }

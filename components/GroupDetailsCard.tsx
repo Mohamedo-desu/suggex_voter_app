@@ -17,13 +17,16 @@ import { nanoid } from "nanoid/non-secure";
 import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
+import CustomButton from "./CustomButton";
+import CustomInput from "./CustomInput";
 
 const GroupDetailsCard = ({
   item,
@@ -60,7 +63,7 @@ const GroupDetailsCard = ({
     addSuffix: true,
   });
 
-  const handleDeleteGroup = async () => {
+  const handleDelete = async () => {
     if (deleting) return;
     setShowAlert(false);
     setDeleting(true);
@@ -73,7 +76,28 @@ const GroupDetailsCard = ({
       setDeleting(false);
     }
   };
-
+  const onPressDelete = () => {
+    if (Platform.OS === "web") {
+      setShowAlert(true);
+    } else {
+      Alert.alert(
+        "Delete",
+        "Are you sure you want to delete this suggestion? This action cannot be undone",
+        [
+          {
+            text: "No, cancel",
+            onPress: undefined,
+            style: "cancel",
+          },
+          {
+            text: "Yes, delete",
+            onPress: () => handleDelete(),
+            style: "destructive",
+          },
+        ]
+      );
+    }
+  };
   const handleSaveProfile = async () => {
     try {
       await editGroup({
@@ -131,7 +155,7 @@ const GroupDetailsCard = ({
                   <ActivityIndicator size="small" color={Colors.error} />
                 ) : (
                   <TouchableOpacity
-                    onPress={() => setShowAlert(true)}
+                    onPress={onPressDelete}
                     style={styles.deleteButton}
                     activeOpacity={0.8}
                   >
@@ -166,7 +190,7 @@ const GroupDetailsCard = ({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Invitation Code: </Text>
           <Text style={styles.detailValue}>
-            {item.invitationCode.substring(0, 20)}...
+            {item.invitationCode.substring(0, 15)}...
           </Text>
           <TouchableOpacity
             style={styles.copyButton}
@@ -207,7 +231,7 @@ const GroupDetailsCard = ({
           confirmText="Yes, delete"
           confirmButtonColor={Colors.error}
           onCancelPressed={() => setShowAlert(false)}
-          onConfirmPressed={handleDeleteGroup}
+          onConfirmPressed={handleDelete}
         />
       </View>
       <BottomSheet
@@ -223,6 +247,7 @@ const GroupDetailsCard = ({
             onPress={closeEditSheet}
           />
         )}
+        handleIndicatorStyle={{ backgroundColor: Colors.primary }}
       >
         <BottomSheetView>
           <View style={styles.modalContent}>
@@ -230,18 +255,23 @@ const GroupDetailsCard = ({
               <Text style={styles.modalTitle}>Edit Group</Text>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Name</Text>
-              <TextInput
-                style={styles.input}
+              <View style={styles.invitationRow}>
+                <Text style={styles.inputLabel}>Group Name</Text>
+              </View>
+
+              <CustomInput
+                placeholder="group name"
                 value={editedGroup.groupName}
-                onChangeText={(text) =>
+                handleChange={(text) =>
                   setEditedGroup((prev) => ({ ...prev, groupName: text }))
                 }
                 placeholderTextColor={Colors.placeholderText}
               />
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Status</Text>
+              <View style={styles.invitationRow}>
+                <Text style={styles.inputLabel}>Status</Text>
+              </View>
               <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={editedGroup.status}
@@ -252,8 +282,16 @@ const GroupDetailsCard = ({
                     }))
                   }
                 >
-                  <Picker.Item label="open" value="open" />
-                  <Picker.Item label="closed" value="closed" />
+                  <Picker.Item
+                    label="open"
+                    value="open"
+                    style={styles.inputLabel}
+                  />
+                  <Picker.Item
+                    label="closed"
+                    value="closed"
+                    style={styles.inputLabel}
+                  />
                 </Picker>
               </View>
             </View>
@@ -269,10 +307,12 @@ const GroupDetailsCard = ({
                   </Text>
                 </TouchableOpacity>
               </View>
-              <TextInput
-                style={[styles.input, { height: 70 }]}
+
+              <CustomInput
+                placeholder="Invitation Code"
+                style={[{ height: 40 }]}
                 value={editedGroup.invitationCode}
-                onChangeText={(text) =>
+                handleChange={(text) =>
                   setEditedGroup((prev) => ({
                     ...prev,
                     invitationCode: text,
@@ -284,12 +324,7 @@ const GroupDetailsCard = ({
                 multiline
               />
             </View>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveProfile}
-            >
-              <Text style={styles.saveButtonText}>Save Changes</Text>
-            </TouchableOpacity>
+            <CustomButton text="Save Changes" onPress={handleSaveProfile} />
           </View>
         </BottomSheetView>
       </BottomSheet>

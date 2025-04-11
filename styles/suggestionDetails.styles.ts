@@ -9,9 +9,9 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   resultHeader: {
-    fontSize: 16,
+    fontSize: 12,
     color: Colors.textDark,
-    fontFamily: Fonts.Bold,
+    fontFamily: Fonts.Medium,
   },
   commentContainer: {
     backgroundColor: Colors.background,
@@ -22,20 +22,9 @@ const styles = StyleSheet.create({
   },
   commentInput: {
     color: Colors.textDark,
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.Regular,
     paddingVertical: 10,
-  },
-  commentButton: {
-    backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 5,
-  },
-  commentButtonText: {
-    color: Colors.white,
-    fontSize: 16,
   },
 });
 

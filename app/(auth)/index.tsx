@@ -1,12 +1,13 @@
+import CustomButton from "@/components/CustomButton";
 import PrivacyTerms from "@/components/PrivacyTerms";
 import Colors from "@/constants/colors";
 import { styles } from "@/styles/auth.styles";
 import { useSSO } from "@clerk/clerk-expo";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 const Login = () => {
   const { startSSOFlow } = useSSO();
@@ -50,20 +51,11 @@ const Login = () => {
       </View>
 
       <View style={styles.loginSection}>
-        <TouchableOpacity
-          style={styles.googleButton}
+        <CustomButton
+          text="Sign in with Google"
           onPress={handleGoogleSignIn}
-          activeOpacity={0.8}
-        >
-          <View style={styles.googleIconContainer}>
-            <Ionicons
-              name="logo-google"
-              size={20}
-              color={Colors.cardBackground}
-            />
-          </View>
-          <Text style={styles.googleButtonText}>Sign in with Google</Text>
-        </TouchableOpacity>
+          style={{ width: "100%", marginBottom: 10 }}
+        />
       </View>
       <PrivacyTerms />
     </View>

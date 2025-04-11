@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Regular,
   },
   resultsContainer: {
+    flex: 1,
     padding: 15,
   },
   resultHeader: {

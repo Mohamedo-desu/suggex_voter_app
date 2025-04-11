@@ -1,4 +1,5 @@
 import Colors from "@/constants/colors";
+import { Fonts } from "@/constants/Fonts";
 import { Dimensions, Platform, StyleSheet } from "react-native";
 const { height, width } = Dimensions.get("window");
 
@@ -21,18 +22,14 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   appName: {
-    fontSize: 42,
-    fontWeight: "700",
-    fontFamily: "JetBrainsMono-Medium",
+    fontSize: 35,
+    fontFamily: Fonts.Bold,
     color: Colors.primary,
-    letterSpacing: 0.5,
     marginBottom: 8,
   },
   tagline: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.placeholderText,
-    letterSpacing: 1,
-    textTransform: "lowercase",
   },
   illustrationContainer: {
     flex: 1,
@@ -41,43 +38,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   illustration: {
-    width: Platform.OS === "web" ? width * 0.15 : width * 0.55,
-    height: Platform.OS === "web" ? width * 0.15 : width * 0.55,
+    width: Platform.OS === "web" ? width * 0.7 : width * 0.55,
+    height: Platform.OS === "web" ? width * 0.7 : width * 0.55,
     maxHeight: 300,
+    maxWidth: 300,
   },
   loginSection: {
     width: "100%",
     paddingHorizontal: 24,
     alignItems: "center",
-  },
-  googleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 5,
-    marginBottom: 20,
-    width: "100%",
-    maxWidth: 300,
-  },
-  googleIconContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.cardBackground,
-  },
-  termsText: {
-    textAlign: "center",
-    fontSize: 12,
-    color: Colors.placeholderText,
-    maxWidth: 280,
   },
 });

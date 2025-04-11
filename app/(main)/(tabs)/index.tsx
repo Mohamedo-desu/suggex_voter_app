@@ -9,7 +9,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Platform,
+  RefreshControl,
+  TouchableOpacity,
+} from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 
 const SuggestionsScreen = () => {
@@ -33,6 +39,24 @@ const SuggestionsScreen = () => {
   };
   const navigation = useNavigation();
 
+  const handleLogOut = async () => {
+    if (Platform.OS === "web") {
+      setShowAlert(true);
+    } else {
+      Alert.alert("Log Out", "Are you sure you want to log out?", [
+        {
+          text: "No, cancel",
+          onPress: undefined,
+          style: "cancel",
+        },
+        {
+          text: "Yes, logout",
+          onPress: () => signOut(),
+          style: "destructive",
+        },
+      ]);
+    }
+  };
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -40,7 +64,7 @@ const SuggestionsScreen = () => {
           style={{ marginLeft: 15 }}
           activeOpacity={0.8}
           hitSlop={10}
-          onPress={() => setShowAlert(true)}
+          onPress={handleLogOut}
         >
           <Ionicons
             name="log-out-outline"

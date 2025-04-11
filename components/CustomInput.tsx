@@ -64,19 +64,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.inputBackground,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: Colors.border,
     padding: 15,
   },
   input: {
     flex: 1,
-    fontFamily: Fonts.Medium,
-    fontSize: 15,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
     color: Colors.textDark,
-  },
-  rightIconContainer: {
-    marginLeft: 10,
   },
   error: {
     color: Colors.error,

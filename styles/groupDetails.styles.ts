@@ -9,8 +9,8 @@ export const styles = StyleSheet.create({
   },
 
   resultHeader: {
-    fontSize: 16,
+    fontSize: 12,
     color: Colors.textDark,
-    fontFamily: Fonts.Bold,
+    fontFamily: Fonts.Medium,
   },
 });

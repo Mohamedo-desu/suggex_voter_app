@@ -9,14 +9,14 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
   },
   commentAuthor: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 10,
+    fontFamily: Fonts.Regular,
     color: Colors.primary,
     marginBottom: 5,
   },
   commentText: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.textDark,
   },
   header: { flexDirection: "row", alignItems: "center" },

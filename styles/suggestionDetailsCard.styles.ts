@@ -5,7 +5,6 @@ import { Platform, StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
-    elevation: 5,
     padding: 10,
     marginTop: 5,
   },
@@ -15,21 +14,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
+  groupStatusText: {
+    fontSize: 12,
+    fontFamily: Fonts.Medium,
+    marginBottom: 8,
+  },
   title: {
     flex: 1,
-    fontSize: 22,
+    fontSize: 16,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
   },
   actionButtons: {
     flexDirection: "row",
+    gap: 10,
   },
-  actionButton: {
-    marginLeft: 10,
-  },
+  actionButton: {},
   description: {
-    fontSize: 14,
-    fontFamily: Fonts.Regular,
+    fontSize: 12,
+    fontFamily: Fonts.Medium,
     color: Colors.textDark,
     marginBottom: 8,
   },
@@ -40,7 +43,7 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 12,
-    fontFamily: Fonts.Medium,
+    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
   },
   detailValue: {
@@ -63,13 +66,13 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    fontFamily: Fonts.Medium,
+    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
     marginRight: 4,
   },
   statNumber: {
     fontSize: 12,
-    fontFamily: Fonts.Medium,
+    fontFamily: Fonts.Regular,
     color: Colors.primary,
   },
   progressWrapper: {
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 5,
-    backgroundColor: Colors.placeholderText,
+    backgroundColor: Colors.lightGray[200],
     borderRadius: 20,
     overflow: "hidden",
   },
@@ -112,8 +115,8 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: Colors.textDark,
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: Fonts.Bold,
   },
   inputContainer: {
     marginBottom: 20,
@@ -121,19 +124,14 @@ const styles = StyleSheet.create({
   inputLabel: {
     color: Colors.textDark,
     marginBottom: 8,
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
   },
-  input: {
-    backgroundColor: Colors.lightGray[200],
-    borderRadius: 8,
-    padding: 12,
-    color: Colors.textDark,
-    fontSize: 16,
-  },
+
   pickerContainer: {
     overflow: "hidden",
     backgroundColor: Colors.cardBackground,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: Colors.border,
     paddingHorizontal: 15,
@@ -143,18 +141,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
 

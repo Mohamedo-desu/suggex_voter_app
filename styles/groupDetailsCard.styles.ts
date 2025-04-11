@@ -12,46 +12,43 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  leftHeader: {},
+  leftHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   groupNameText: {
-    fontSize: 22,
+    fontSize: 16,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
   },
   actionButtons: {
     flexDirection: "row",
-    gap: 10,
-    position: "absolute",
-    top: 0,
-    right: 0,
+    gap: 15,
   },
-  editButton: {
-    marginRight: 10,
-  },
-  deleteButton: {
-    // Customize as needed
-  },
+  editButton: {},
+  deleteButton: {},
   groupStatusText: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: Fonts.Medium,
   },
   detailRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 2,
   },
   detailLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.Regular,
     color: Colors.textDark,
   },
   copyButton: {
-    marginLeft: 10,
+    marginLeft: 15,
   },
   statsContainer: {
     flexDirection: "row",
@@ -64,13 +61,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
   },
   statNumber: {
-    fontSize: 14,
-    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
     color: Colors.primary,
   },
   modalContainer: {
@@ -89,16 +86,16 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: Colors.textDark,
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: Fonts.Bold,
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputLabel: {
     color: Colors.textDark,
-    marginBottom: 8,
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: Fonts.Regular,
   },
   input: {
     backgroundColor: Colors.lightGray[200],
@@ -110,7 +107,7 @@ const styles = StyleSheet.create({
   pickerContainer: {
     overflow: "hidden",
     backgroundColor: Colors.cardBackground,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: Colors.border,
     paddingHorizontal: 15,
@@ -120,18 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: "600",
+    marginBottom: 8,
   },
 });
 
