@@ -78,9 +78,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-font",
         {
           fonts: [
-            "./assets/fonts/Poppins-Bold.ttf",
-            "./assets/fonts/Poppins-Medium.ttf",
-            "./assets/fonts/Poppins-Regular.ttf",
+            "./assets/fonts/Urbanist-Bold.ttf",
+            "./assets/fonts/Urbanist-Medium.ttf",
+            "./assets/fonts/Urbanist-Regular.ttf",
           ],
         },
       ],

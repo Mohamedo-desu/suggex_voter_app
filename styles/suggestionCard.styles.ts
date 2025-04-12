@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    padding: 15,
+    padding: 10,
   },
   rejected: {
     backgroundColor: Colors.error,

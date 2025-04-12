@@ -51,7 +51,9 @@ export interface SuggestionProps {
   likesCount: number;
   endGoal: number;
   status: string;
-  hasLiked: boolean;
+  hasLiked?: boolean;
+  storageId: string;
+  imageUrl: string;
   _creationTime: number | Date;
 }
 
@@ -79,27 +81,5 @@ export interface LikeProps {
   _id: Id<"likes">;
   userId: Id<"users">;
   suggestionId: Id<"suggestions">;
-  _creationTime: number | Date;
-}
-
-/** Bookmarks table: records bookmarked suggestions by users. */
-export interface BookmarkProps {
-  _id: Id<"bookmarks">;
-  userId: Id<"users">;
-  suggestionId: Id<"suggestions">;
-  _creationTime: number | Date;
-}
-
-/** Notification type literal union for notifications. */
-export type NotificationType = "like" | "comment" | "closed";
-
-/** Notifications table: stores notifications sent between users. */
-export interface NotificationProps {
-  _id: Id<"notifications">;
-  receiverId: Id<"users">;
-  senderId: Id<"users">;
-  type: NotificationType;
-  suggestionId?: Id<"suggestions">;
-  commentId?: Id<"comments">;
   _creationTime: number | Date;
 }

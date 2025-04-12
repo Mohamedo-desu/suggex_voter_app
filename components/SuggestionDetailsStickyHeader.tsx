@@ -10,7 +10,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 
-const GroupDetailsStickyHeader = ({ item, scrollY }) => {
+const SuggestionDetailsStickyHeader = ({ item, scrollY }) => {
   // Store the measured height of the header
   const [headerHeight, setHeaderHeight] = useState(0);
 
@@ -37,33 +37,17 @@ const GroupDetailsStickyHeader = ({ item, scrollY }) => {
     };
   });
 
-  const {
-    groupName,
-    status,
-    suggestionsCount,
-    approvedCount,
-    rejectedCount,
-    imageUrl,
-  } = item || {};
-
+  const { title, status, likesCount, commentsCount, imageUrl } = item || {};
   const isActive = status === "open";
-  const imageSource = imageUrl
-    ? imageUrl
-    : require("@/assets/icons/avatar.png");
+
   return (
     <Animated.View
       style={[styles.stickyHeader, stickyHeaderStyle]}
       onLayout={onLayoutHeader}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Image
-          source={imageSource}
-          contentFit="contain"
-          style={styles.groupLogo}
-          transition={300}
-        />
+      <View style={{ gap: 10, width: "100%" }}>
         <View>
-          <Text style={styles.groupNameText}>{groupName}</Text>
+          <Text style={styles.groupNameText}>{title}</Text>
           <Text
             style={[
               styles.groupStatusText,
@@ -73,16 +57,23 @@ const GroupDetailsStickyHeader = ({ item, scrollY }) => {
             {isActive ? "Active" : "Inactive"}
           </Text>
         </View>
+        {imageUrl && (
+          <Image
+            source={imageUrl}
+            contentFit="cover"
+            style={styles.groupLogo}
+            transition={300}
+          />
+        )}
       </View>
 
       <View style={styles.statsContainer}>
         {[
-          { label: "suggestions", count: suggestionsCount },
-          { label: "approved", count: approvedCount },
-          { label: "rejected", count: rejectedCount },
+          { label: "upvotes", count: likesCount },
+          { label: "comments", count: commentsCount },
         ].map(({ label, count }) => (
           <View key={label} style={styles.statItemContainer}>
-            <Text style={styles.statLabel}>{label} : </Text>
+            <Text style={styles.statLabel}>{label}:</Text>
             <AnimatedNumber
               animateToNumber={count}
               animationDuration={1000}
@@ -96,7 +87,7 @@ const GroupDetailsStickyHeader = ({ item, scrollY }) => {
   );
 };
 
-export default GroupDetailsStickyHeader;
+export default SuggestionDetailsStickyHeader;
 
 const styles = StyleSheet.create({
   stickyHeader: {
@@ -116,9 +107,8 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   groupLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: "100%",
+    height: 100,
   },
   groupNameText: {
     fontSize: 12,

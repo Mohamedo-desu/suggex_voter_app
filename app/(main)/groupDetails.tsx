@@ -1,5 +1,3 @@
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
 import Empty from "@/components/Empty";
 import GroupDetailsCard from "@/components/GroupDetailsCard";
 import GroupDetailsStickyHeader from "@/components/GroupDetailsStickyHeader";
@@ -17,13 +15,11 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Picker } from "@react-native-picker/picker";
 import { useMutation, useQuery } from "convex/react";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { nanoid } from "nanoid/non-secure";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { FC, useEffect, useMemo, useRef } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   LinearTransition,
@@ -44,70 +40,21 @@ const GroupDetails: FC = () => {
   const suggestions = useQuery(api.suggestion.fetchSuggestions, {
     groupId: groupId as Id<"groups">,
   }) as SuggestionProps[];
+
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {
     groupId: groupId as Id<"groups">,
   }) as GroupProps;
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
 
-  // State for group editing and image selection
-  const [editedGroup, setEditedGroup] = useState({
-    groupName: groupDetails?.groupName || "",
-    invitationCode: groupDetails?.invitationCode || "",
-    status: groupDetails?.status || "open",
-  });
-
   const editGroup = useMutation(api.suggestion.editGroup);
 
   // BottomSheet refs
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const imageBottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["90%"], []);
   const imageSnapPoints = useMemo(() => ["25%"], []);
 
-  // Functions for opening/closing sheets
-  const openEditSheet = () => bottomSheetRef.current?.expand();
-  const closeEditSheet = () => {
-    bottomSheetRef.current?.close();
-    setEditedGroup({
-      groupName: groupDetails?.groupName,
-      invitationCode: groupDetails?.invitationCode,
-      status: groupDetails?.status,
-    });
-  };
   const openImagePickerSheet = () => {
     imageBottomSheetRef.current?.expand();
   };
-
-  // Save group profile changes
-  const handleSaveProfile = async () => {
-    try {
-      await editGroup({
-        groupId: groupId as Id<"groups">,
-        groupName: editedGroup.groupName,
-        invitationCode: editedGroup.invitationCode,
-        status: editedGroup.status,
-      });
-    } catch (error) {
-      console.error("Error updating profile", error);
-    } finally {
-      bottomSheetRef.current?.close();
-    }
-  };
-
-  // Generate a new invitation code
-  const generateNewInvitation = () => {
-    const invitationCode = `grp${nanoid(5)}${userId}${nanoid(5)}G0g`;
-    setEditedGroup((prev) => ({ ...prev, invitationCode }));
-  };
-
-  // Update edited group when details change
-  useEffect(() => {
-    setEditedGroup({
-      groupName: groupDetails?.groupName,
-      invitationCode: groupDetails?.invitationCode,
-      status: groupDetails?.status,
-    });
-  }, [groupDetails]);
 
   // Redirect if unauthorized or group not found
   useEffect(() => {
@@ -224,116 +171,30 @@ const GroupDetails: FC = () => {
 
   return (
     <>
-      {/* Sticky Header*/}
       <GroupDetailsStickyHeader item={groupDetails} scrollY={scrollY} />
 
-      <Animated.FlatList
-        data={suggestions}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        ListEmptyComponent={<Empty text="No suggestions found" />}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            <GroupDetailsCard
-              item={groupDetails}
-              openEditSheet={openEditSheet}
-              openImagePickerSheet={openImagePickerSheet}
-            />
-            <Text style={styles.resultHeader}>Suggestions</Text>
-          </>
-        }
-        scrollEventThrottle={16}
-        onScroll={scrollHandler}
-        itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
-      />
-
-      {/* Group Edit BottomSheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            disappearsOnIndex={-1}
-            appearsOnIndex={0}
-            onPress={closeEditSheet}
-          />
-        )}
-        handleIndicatorStyle={{ backgroundColor: Colors.primary }}
-      >
-        <BottomSheetView>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Group</Text>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Group Name</Text>
-              <CustomInput
-                placeholder="group name"
-                value={editedGroup.groupName}
-                handleChange={(text) =>
-                  setEditedGroup((prev) => ({ ...prev, groupName: text }))
-                }
-                maxLength={40}
-                numberOfLines={1}
-                placeholderTextColor={Colors.placeholderText}
+      {groupDetails && (
+        <Animated.FlatList
+          data={suggestions}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          ListEmptyComponent={<Empty text="No suggestions found" />}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <>
+              <GroupDetailsCard
+                item={groupDetails}
+                openImagePickerSheet={openImagePickerSheet}
               />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Status</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={editedGroup.status}
-                  onValueChange={(itemValue) =>
-                    setEditedGroup((prev) => ({ ...prev, status: itemValue }))
-                  }
-                >
-                  <Picker.Item
-                    label="open"
-                    value="open"
-                    style={styles.inputLabel}
-                  />
-                  <Picker.Item
-                    label="closed"
-                    value="closed"
-                    style={styles.inputLabel}
-                  />
-                </Picker>
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <View style={styles.invitationRow}>
-                <Text style={styles.inputLabel}>Invitation Code</Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={generateNewInvitation}
-                >
-                  <Text style={[styles.inputLabel, { color: Colors.primary }]}>
-                    Generate New
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <CustomInput
-                placeholder="Invitation Code"
-                style={{ height: 40 }}
-                value={editedGroup.invitationCode}
-                handleChange={(text) =>
-                  setEditedGroup((prev) => ({ ...prev, invitationCode: text }))
-                }
-                placeholderTextColor={Colors.placeholderText}
-                editable={false}
-                textAlignVertical="top"
-                multiline
-              />
-            </View>
-            <CustomButton text="Save Changes" onPress={handleSaveProfile} />
-          </View>
-        </BottomSheetView>
-      </BottomSheet>
+              <Text style={styles.resultHeader}>Suggestions</Text>
+            </>
+          }
+          scrollEventThrottle={16}
+          onScroll={scrollHandler}
+          itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
+        />
+      )}
 
       {/* Image Selection BottomSheet */}
       <BottomSheet
@@ -351,20 +212,20 @@ const GroupDetails: FC = () => {
         )}
         handleIndicatorStyle={{ backgroundColor: Colors.primary }}
       >
-        <BottomSheetView style={localStyles.imagePickerContainer}>
-          <Text style={localStyles.imagePickerTitle}>Select Image</Text>
-          <View style={localStyles.imagePickerOptions}>
+        <BottomSheetView style={styles.imagePickerContainer}>
+          <Text style={styles.imagePickerTitle}>Select Image</Text>
+          <View style={styles.imagePickerOptions}>
             <TouchableOpacity
               onPress={handleCameraPick}
-              style={localStyles.iconButton}
+              style={styles.iconButton}
             >
-              <Ionicons name="camera" size={30} color="white" />
+              <Ionicons name="camera" size={30} color={Colors.white} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleGalleryPick}
-              style={localStyles.iconButton}
+              style={styles.iconButton}
             >
-              <Ionicons name="image" size={30} color="white" />
+              <Ionicons name="image" size={30} color={Colors.white} />
             </TouchableOpacity>
           </View>
         </BottomSheetView>
@@ -372,31 +233,5 @@ const GroupDetails: FC = () => {
     </>
   );
 };
-
-const localStyles = StyleSheet.create({
-  imagePickerContainer: {
-    padding: 16,
-    alignItems: "center",
-  },
-  imagePickerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  imagePickerOptions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-  },
-  iconButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-});
 
 export default GroupDetails;

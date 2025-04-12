@@ -39,6 +39,20 @@ const MainLayout = () => {
           headerTitleAlign: "center",
         }}
       />
+      <Stack.Screen
+        name="editGroup"
+        options={{
+          title: "Edit Group",
+          headerTitleAlign: "center",
+        }}
+      />
+      <Stack.Screen
+        name="editSuggestion"
+        options={{
+          title: "Edit Suggestion",
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 };

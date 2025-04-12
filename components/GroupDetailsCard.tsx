@@ -27,13 +27,11 @@ import AwesomeAlert from "react-native-awesome-alerts";
 
 interface GroupDetailsCardProps {
   item: GroupProps;
-  openEditSheet: () => void;
   openImagePickerSheet: () => void;
 }
 
 const GroupDetailsCard = ({
   item,
-  openEditSheet,
   openImagePickerSheet,
 }: GroupDetailsCardProps) => {
   if (!item) return null;
@@ -121,7 +119,7 @@ const GroupDetailsCard = ({
               />
               {/* Overlay icon to indicate tap-to-change */}
               <View style={styles.cameraOverlay}>
-                <Ionicons name="camera" size={16} color="white" />
+                <Ionicons name="camera" size={16} color={Colors.white} />
               </View>
             </TouchableOpacity>
             <View style={{ flex: 1 }}>
@@ -142,14 +140,21 @@ const GroupDetailsCard = ({
           {role === "owner" && (
             <View style={styles.actionButtons}>
               <TouchableOpacity
-                onPress={openEditSheet}
+                onPress={() =>
+                  router.navigate({
+                    pathname: "/(main)/editGroup",
+                    params: {
+                      groupId: item._id,
+                    },
+                  })
+                }
                 style={styles.editButton}
                 activeOpacity={0.8}
               >
                 <MaterialCommunityIcons
                   name="file-edit-outline"
                   size={24}
-                  color={Colors.invited}
+                  color={Colors.primary}
                 />
               </TouchableOpacity>
               {deleting ? (

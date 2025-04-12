@@ -14,13 +14,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 interface CommentItemProps {
   item: CommentProps;
   userId: string;
+  index: number;
 }
 
-const Comment = ({ item, userId }: CommentItemProps) => {
+const Comment = ({ item, userId, index }: CommentItemProps) => {
   const currentUser = useQuery(
     api.user.getUserByClerkId,
     userId ? { clerkId: userId } : "skip"
@@ -67,7 +69,11 @@ const Comment = ({ item, userId }: CommentItemProps) => {
     }
   };
   return (
-    <>
+    <Animated.View
+      entering={ZoomIn.delay(index * 100)}
+      exiting={ZoomOut}
+      style={{ marginHorizontal: 10 }}
+    >
       <View style={styles.commentContainer}>
         <View style={styles.headerContainer}>
           <View style={styles.header}>
@@ -100,7 +106,7 @@ const Comment = ({ item, userId }: CommentItemProps) => {
 
         <Text style={styles.commentText}>{item.content}</Text>
       </View>
-    </>
+    </Animated.View>
   );
 };
 

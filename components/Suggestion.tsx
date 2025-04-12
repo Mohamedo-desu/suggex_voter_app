@@ -134,7 +134,7 @@ const Suggestion: FC<{
       entering={SlideInDown.delay(index * 100)}
       exiting={SlideOutLeft}
       layout={LinearTransition}
-      style={{ marginHorizontal: 15 }}
+      style={{ marginHorizontal: 10 }}
     >
       <TouchableOpacity
         style={[styles.container, { opacity: isClosed && !isOwner ? 0.5 : 1 }]}

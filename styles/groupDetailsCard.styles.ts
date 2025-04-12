@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   groupNameText: {
-    fontSize: 16,
+    fontSize: 13,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
   },

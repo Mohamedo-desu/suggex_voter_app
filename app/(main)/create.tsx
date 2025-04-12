@@ -182,6 +182,7 @@ const CreateScreen = () => {
                         errors={errors.suggestionTitle}
                         touched={touched.suggestionTitle}
                         autoCorrect={true}
+                        maxLength={50}
                       />
                       <CustomInput
                         value={values.suggestionDescription}

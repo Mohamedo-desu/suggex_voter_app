@@ -9,10 +9,15 @@ export const styles = StyleSheet.create({
     elevation: 0,
     justifyContent: "center",
     height: 80,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     gap: 10,
   },
-  groupHeader: { flex: 1, flexDirection: "row", alignItems: "center", gap: 5 },
+  groupHeader: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
   groupLogo: {
     width: 35,
     height: 35,
@@ -30,7 +35,8 @@ export const styles = StyleSheet.create({
     gap: 15,
   },
   groupNameText: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 14,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
   },

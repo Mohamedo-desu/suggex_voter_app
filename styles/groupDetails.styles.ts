@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.Medium,
     padding: 0,
     marginTop: 10,
-    marginHorizontal: 15,
+    marginHorizontal: 10,
   },
   modalContainer: {
     flex: 1,
@@ -22,7 +22,8 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    padding: 20,
+    padding: 15,
+    backgroundColor: Colors.background,
   },
   modalHeader: {
     flexDirection: "row",
@@ -77,11 +78,13 @@ export const styles = StyleSheet.create({
     elevation: 10,
     paddingHorizontal: 15,
     gap: 10,
+    paddingBottom: 5,
+    borderBottomWidth: 1.5,
+    borderBottomColor: Colors.border,
   },
   groupLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: "100%",
+    height: 100,
   },
   groupNameText: {
     fontSize: 12,
@@ -105,10 +108,34 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
+    marginRight: 4,
   },
   statNumber: {
     fontSize: 12,
     fontFamily: Fonts.Regular,
     color: Colors.primary,
+  },
+  imagePickerContainer: {
+    padding: 16,
+    alignItems: "center",
+  },
+  imagePickerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  imagePickerOptions: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+  },
+  iconButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
   },
 });

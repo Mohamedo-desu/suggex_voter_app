@@ -1,6 +1,5 @@
 import Colors from "@/constants/colors";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import styles from "@/styles/suggestionDetailsCard.styles";
 import { SuggestionProps } from "@/types";
 import {
@@ -8,17 +7,12 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { Picker } from "@react-native-picker/picker";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
+import { Image } from "expo-image";
 import { router } from "expo-router";
-import { nanoid } from "nanoid/non-secure";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { Alert, Platform, Text, TouchableOpacity, View } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -27,8 +21,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import CustomButton from "./CustomButton";
-import CustomInput from "./CustomInput";
 
 interface SuggestionDetailsCardProps {
   item: SuggestionProps;
@@ -39,15 +31,13 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
   item,
   userId,
 }) => {
+  if (!item) return null;
+  const [isLiked, setIsLiked] = useState(item?.hasLiked);
+
   const [showAlert, setShowAlert] = useState(false);
-  const [editedSuggestion, setEditedSuggestion] = useState({
-    invitationCode: item?.invitationCode || "",
-    status: item?.status || "open",
-    endGoal: item?.endGoal.toString() || "",
-  });
 
   const deleteSuggestion = useMutation(api.suggestion.deleteSuggestion);
-  const editSuggestion = useMutation(api.suggestion.editSuggestion);
+
   const toggleLike = useMutation(api.suggestion.toggleLike);
 
   const currentUser = useQuery(
@@ -97,26 +87,6 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
     }
   };
 
-  const handleSaveProfile = async () => {
-    try {
-      await editSuggestion({
-        suggestionId: item?._id as Id<"suggestions">,
-        invitationCode: editedSuggestion.invitationCode,
-        status: editedSuggestion.status,
-        endGoal: parseInt(editedSuggestion.endGoal),
-      });
-    } catch (error) {
-      console.error("Error updating profile", error);
-    } finally {
-      bottomSheetRef.current?.close();
-    }
-  };
-
-  const generateNewInvitation = () => {
-    const invitationCode = `sug${nanoid(5)}${item?.groupId}${nanoid(5)}S0s`;
-    setEditedSuggestion((prev) => ({ ...prev, invitationCode }));
-  };
-
   const progress = useMemo(() => {
     if (item?.endGoal > 0) {
       return Math.min(item?.likesCount / item?.endGoal, 1) * 100;
@@ -133,31 +103,20 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
     width: `${progressShared.value}%`,
   }));
 
-  const hasLiked = item?.hasLiked;
   const handleLike = async () => {
     try {
-      await toggleLike({ suggestionId: item?._id });
+      if (isLiked) {
+        setIsLiked(false);
+      } else {
+        setIsLiked(true);
+      }
+      const newIsLiked = await toggleLike({ suggestionId: item?._id });
+      setIsLiked(newIsLiked);
     } catch (error) {
       console.error("Error liking or disliking a post", error);
     }
   };
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["90%"], []);
-
-  const openEditSheet = () => {
-    bottomSheetRef.current?.expand();
-  };
-
-  const closeEditSheet = () => {
-    bottomSheetRef.current?.close();
-
-    setEditedSuggestion({
-      invitationCode: item?.invitationCode,
-      status: item?.status,
-      endGoal: item?.endGoal.toString(),
-    });
-  };
   const isActive = item?.status === "open";
 
   return (
@@ -169,11 +128,21 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
           </Text>
           {isOwner && (
             <View style={styles.actionButtons}>
-              <TouchableOpacity onPress={openEditSheet} activeOpacity={0.8}>
+              <TouchableOpacity
+                onPress={() =>
+                  router.navigate({
+                    pathname: "/(main)/editSuggestion",
+                    params: {
+                      suggestionId: item._id,
+                    },
+                  })
+                }
+                activeOpacity={0.8}
+              >
                 <MaterialCommunityIcons
                   name="file-edit-outline"
                   size={20}
-                  color={Colors.invited}
+                  color={Colors.primary}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -210,7 +179,13 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
                 : "Rejected"}
         </Text>
         <Text style={styles.description}>{item?.description}</Text>
-
+        {item?.imageUrl && (
+          <Image
+            source={{ uri: item?.imageUrl }}
+            style={{ width: "100%", height: 200, marginBottom: 10 }}
+            contentFit="cover"
+          />
+        )}
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Created: </Text>
           <Text style={styles.detailValue}>{creationTimeFormatted}</Text>
@@ -260,7 +235,7 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
                 hitSlop={10}
               >
                 <Ionicons
-                  name={hasLiked ? "heart" : "heart-outline"}
+                  name={isLiked ? "heart" : "heart-outline"}
                   size={20}
                   color={Colors.primary}
                 />
@@ -271,111 +246,6 @@ const SuggestionDetailsCard: FC<SuggestionDetailsCardProps> = ({
         </View>
       </View>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            disappearsOnIndex={-1}
-            appearsOnIndex={0}
-            onPress={closeEditSheet}
-          />
-        )}
-        handleIndicatorStyle={{ backgroundColor: Colors.primary }}
-      >
-        <BottomSheetScrollView contentContainerStyle={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Edit Suggestion</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Status</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={editedSuggestion.status}
-                onValueChange={(itemValue) =>
-                  setEditedSuggestion((prev) => ({
-                    ...prev,
-                    status: itemValue,
-                  }))
-                }
-              >
-                <Picker.Item
-                  label="open"
-                  value="open"
-                  style={styles.inputLabel}
-                />
-                <Picker.Item
-                  label="Approved"
-                  value="approved"
-                  style={styles.inputLabel}
-                />
-                <Picker.Item
-                  label="Rejected"
-                  value="rejected"
-                  style={styles.inputLabel}
-                />
-                <Picker.Item
-                  label="Closed"
-                  value="closed"
-                  style={styles.inputLabel}
-                />
-              </Picker>
-            </View>
-          </View>
-          {item.status === "open" && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                End Goal for this Suggestion
-              </Text>
-              <CustomInput
-                placeholder="group name"
-                value={editedSuggestion.endGoal}
-                handleChange={(text) =>
-                  setEditedSuggestion((prev) => ({
-                    ...prev,
-                    endGoal: text,
-                  }))
-                }
-                placeholderTextColor={Colors.placeholderText}
-              />
-            </View>
-          )}
-          <View style={styles.inputContainer}>
-            <View style={styles.invitationRow}>
-              <Text style={styles.inputLabel}>Invitation Code</Text>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={generateNewInvitation}
-              >
-                <Text style={[styles.inputLabel, { color: Colors.primary }]}>
-                  Generate New
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <CustomInput
-              placeholder="Invitation Code"
-              style={[{ height: 40 }]}
-              value={editedSuggestion.invitationCode}
-              handleChange={(text) =>
-                setEditedSuggestion((prev) => ({
-                  ...prev,
-                  invitationCode: text,
-                }))
-              }
-              placeholderTextColor={Colors.placeholderText}
-              editable={false}
-              textAlignVertical="top"
-              multiline
-            />
-          </View>
-
-          <CustomButton text="Save Changes" onPress={handleSaveProfile} />
-        </BottomSheetScrollView>
-      </BottomSheet>
       <AwesomeAlert
         show={showAlert}
         showProgress={false}
