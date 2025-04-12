@@ -17,6 +17,8 @@ export default defineSchema({
     groupName: v.string(),
     suggestionsCount: v.number(),
     status: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    imageUrl: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
     .index("by_groupName", ["groupName"])
@@ -43,6 +45,8 @@ export default defineSchema({
     likesCount: v.number(),
     endGoal: v.optional(v.number()),
     status: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    imageUrl: v.optional(v.string()),
   })
     .index("by_group", ["groupId"])
     .index("status", ["status"])

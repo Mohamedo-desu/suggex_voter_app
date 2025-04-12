@@ -25,16 +25,26 @@ const GroupDetailsStickyHeader = ({ item, scrollY }) => {
     };
   });
 
-  const { groupName, status, suggestionsCount, approvedCount, rejectedCount } =
-    item || {};
+  const {
+    groupName,
+    status,
+    suggestionsCount,
+    approvedCount,
+    rejectedCount,
+    imageUrl,
+  } = item || {};
 
   const isActive = status === "open";
-
+  const imageSource = imageUrl
+    ? imageUrl
+    : require("@/assets/icons/avatar.png");
   return (
     <Animated.View style={[styles.stickyHeader, stickyHeaderStyle]}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <Image
-          source={require("@/assets/icons/avatar.png")}
+          source={
+            typeof imageSource === "string" ? { uri: imageSource } : imageSource
+          }
           contentFit="contain"
           style={styles.groupLogo}
           transition={300}

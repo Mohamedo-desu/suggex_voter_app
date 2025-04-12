@@ -1,19 +1,3 @@
-import { useAuth } from "@clerk/clerk-expo";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Picker } from "@react-native-picker/picker";
-import { useMutation, useQuery } from "convex/react";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { nanoid } from "nanoid/non-secure";
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from "react-native-reanimated";
-
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
 import Empty from "@/components/Empty";
@@ -26,13 +10,33 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { styles } from "@/styles/groupDetails.styles";
 import { GroupProps, SuggestionProps } from "@/types";
+import { getMimeType } from "@/utils/mimeType";
+import { useAuth } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { Picker } from "@react-native-picker/picker";
+import { useMutation, useQuery } from "convex/react";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { nanoid } from "nanoid/non-secure";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  Easing,
+  LinearTransition,
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from "react-native-reanimated";
 
 const GroupDetails: FC = () => {
   const { groupId } = useLocalSearchParams();
   const router = useRouter();
   const { userId } = useAuth();
 
-  // Fetch current user, suggestions, and group details.
+  // Data queries
   const currentUser = useQuery(
     api.user.getUserByClerkId,
     userId ? { clerkId: userId } : "skip"
@@ -43,18 +47,24 @@ const GroupDetails: FC = () => {
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {
     groupId: groupId as Id<"groups">,
   }) as GroupProps;
+  const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
 
-  // State for group edit modal
+  // State for group editing and image selection
   const [editedGroup, setEditedGroup] = useState({
     groupName: groupDetails?.groupName || "",
     invitationCode: groupDetails?.invitationCode || "",
     status: groupDetails?.status || "open",
   });
+
   const editGroup = useMutation(api.suggestion.editGroup);
 
-  // BottomSheet Ref and configuration
+  // BottomSheet refs
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const imageBottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["90%"], []);
+  const imageSnapPoints = useMemo(() => ["25%"], []);
+
+  // Functions for opening/closing sheets
   const openEditSheet = () => bottomSheetRef.current?.expand();
   const closeEditSheet = () => {
     bottomSheetRef.current?.close();
@@ -64,8 +74,11 @@ const GroupDetails: FC = () => {
       status: groupDetails?.status,
     });
   };
+  const openImagePickerSheet = () => {
+    imageBottomSheetRef.current?.expand();
+  };
 
-  // Save changes to group
+  // Save group profile changes
   const handleSaveProfile = async () => {
     try {
       await editGroup({
@@ -87,7 +100,16 @@ const GroupDetails: FC = () => {
     setEditedGroup((prev) => ({ ...prev, invitationCode }));
   };
 
-  // Redirect away if group is not found or if the user is not authorized
+  // Update edited group when details change
+  useEffect(() => {
+    setEditedGroup({
+      groupName: groupDetails?.groupName,
+      invitationCode: groupDetails?.invitationCode,
+      status: groupDetails?.status,
+    });
+  }, [groupDetails]);
+
+  // Redirect if unauthorized or group not found
   useEffect(() => {
     if (!groupDetails) return;
     if (
@@ -97,17 +119,14 @@ const GroupDetails: FC = () => {
       router.back();
     }
   }, [groupDetails, router, currentUser]);
-
   useEffect(() => {
     if (groupDetails !== undefined && !groupDetails) {
       router.back();
     }
   }, [groupDetails, router]);
 
-  // Reanimated shared value to track scroll Y offset
+  // Reanimated scroll tracking
   const scrollY = useSharedValue(0);
-
-  // Reanimated scroll handler that updates the shared value
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
@@ -126,11 +145,88 @@ const GroupDetails: FC = () => {
     return <Suggestion item={item} userId={userId} index={index} />;
   };
 
+  // Handle camera image selection
+  const handleCameraPick = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Camera permissions are required to take a photo.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: "images",
+      allowsEditing: true,
+      quality: 0.7,
+      aspect: [1, 1],
+    });
+    if (!result.canceled) {
+      await uploadImage(result.assets[0].uri);
+    }
+    imageBottomSheetRef.current?.close();
+  };
+
+  // Handle gallery image selection
+  const handleGalleryPick = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Media library permissions are required to select an image.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "images",
+      allowsEditing: true,
+      quality: 0.7,
+      aspect: [1, 1],
+    });
+    if (!result.canceled) {
+      await uploadImage(result.assets[0].uri);
+    }
+    imageBottomSheetRef.current?.close();
+  };
+
+  const uploadImage = async (uri: string) => {
+    try {
+      // Convert the selected image URI to a Blob.
+      const imageResponse = await fetch(uri);
+      const imageBlob = await imageResponse.blob();
+
+      // Generate the upload URL.
+      const uploadUrl = await generateUploadUrl();
+
+      // Upload the blob to the generated URL.
+      const uploadResult = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": getMimeType(uri),
+        },
+        body: imageBlob,
+      });
+
+      // Check for a successful upload.
+      if (uploadResult.status !== 200) {
+        const errorText = await uploadResult.text();
+        throw new Error("Image upload failed: " + errorText);
+      }
+
+      // Parse the JSON response.
+      const { storageId } = await uploadResult.json();
+
+      await editGroup({
+        groupId: groupId as Id<"groups">,
+        storageId,
+      });
+    } catch (error) {
+      console.error("Image upload failed", error);
+      Alert.alert("Upload failed", "Could not upload image, please try again.");
+    }
+  };
+
   if (suggestions === undefined) return <Loader />;
 
   return (
     <>
+      {/* Sticky Header*/}
       <GroupDetailsStickyHeader item={groupDetails} scrollY={scrollY} />
+
       <Animated.FlatList
         data={suggestions}
         keyExtractor={(item) => item._id}
@@ -143,14 +239,17 @@ const GroupDetails: FC = () => {
             <GroupDetailsCard
               item={groupDetails}
               openEditSheet={openEditSheet}
+              openImagePickerSheet={openImagePickerSheet}
             />
             <Text style={styles.resultHeader}>Suggestions</Text>
           </>
         }
         scrollEventThrottle={16}
         onScroll={scrollHandler}
+        itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
       />
 
+      {/* Group Edit BottomSheet */}
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
@@ -179,6 +278,8 @@ const GroupDetails: FC = () => {
                 handleChange={(text) =>
                   setEditedGroup((prev) => ({ ...prev, groupName: text }))
                 }
+                maxLength={40}
+                numberOfLines={1}
                 placeholderTextColor={Colors.placeholderText}
               />
             </View>
@@ -233,8 +334,69 @@ const GroupDetails: FC = () => {
           </View>
         </BottomSheetView>
       </BottomSheet>
+
+      {/* Image Selection BottomSheet */}
+      <BottomSheet
+        ref={imageBottomSheetRef}
+        index={-1}
+        snapPoints={imageSnapPoints}
+        enablePanDownToClose
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+            onPress={() => imageBottomSheetRef.current?.close()}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: Colors.primary }}
+      >
+        <BottomSheetView style={localStyles.imagePickerContainer}>
+          <Text style={localStyles.imagePickerTitle}>Select Image</Text>
+          <View style={localStyles.imagePickerOptions}>
+            <TouchableOpacity
+              onPress={handleCameraPick}
+              style={localStyles.iconButton}
+            >
+              <Ionicons name="camera" size={30} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleGalleryPick}
+              style={localStyles.iconButton}
+            >
+              <Ionicons name="image" size={30} color="white" />
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </>
   );
 };
+
+const localStyles = StyleSheet.create({
+  imagePickerContainer: {
+    padding: 16,
+    alignItems: "center",
+  },
+  imagePickerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  imagePickerOptions: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+  },
+  iconButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+});
 
 export default GroupDetails;

@@ -248,7 +248,7 @@ export const deleteGroup = mutation({
     groupId: v.id("groups"),
   },
   handler: async (ctx, { groupId }) => {
-    const { db } = ctx;
+    const { db, storage } = ctx;
     const currentUser = await getAuthenticatedUser(ctx);
 
     // Fetch the group to ensure it exists.
@@ -311,6 +311,11 @@ export const deleteGroup = mutation({
       await db.delete(invitation._id);
     }
 
+    // delete the storage file
+    if (group.storageId) {
+      await storage.delete(group.storageId);
+    }
+
     // Delete the group.
     await db.delete(groupId);
 
@@ -323,7 +328,7 @@ export const deleteSuggestion = mutation({
     suggestionId: v.id("suggestions"),
   },
   handler: async (ctx, { suggestionId }) => {
-    const { db } = ctx;
+    const { db, storage } = ctx;
     const currentUser = await getAuthenticatedUser(ctx);
 
     const suggestion = await db.get(suggestionId);
@@ -361,6 +366,11 @@ export const deleteSuggestion = mutation({
       .collect();
     for (const like of likes) {
       await db.delete(like._id);
+    }
+
+    // delete the storage file
+    if (suggestion.storageId) {
+      await storage.delete(suggestion.storageId);
     }
 
     // Finally, delete the suggestion itself.
@@ -640,22 +650,41 @@ export const toggleLike = mutation({
 export const editGroup = mutation({
   args: {
     groupId: v.id("groups"),
-    groupName: v.string(),
-    invitationCode: v.string(),
-    status: v.union(v.literal("open"), v.literal("closed")),
+    groupName: v.optional(v.string()),
+    invitationCode: v.optional(v.string()),
+    status: v.optional(v.union(v.literal("open"), v.literal("closed"))),
+    storageId: v.optional(v.id("_storage")),
   },
-  handler: async (ctx, { groupId, groupName, status, invitationCode }) => {
-    const { db } = ctx;
+  handler: async (
+    ctx,
+    { groupId, groupName, status, invitationCode, storageId }
+  ) => {
+    const { db, storage } = ctx;
     const currentUser = await getAuthenticatedUser(ctx);
 
     const group = await db.get(groupId);
     if (!group) throw new Error("Group not found");
-
     if (group.userId !== currentUser._id) throw new Error("Unauthorized");
 
-    await db.patch(groupId, { groupName, status, invitationCode });
+    // Prepare an update object.
+    const update: Record<string, any> = {};
+
+    if (groupName !== undefined) update.groupName = groupName;
+    if (status !== undefined) update.status = status;
+    if (invitationCode !== undefined) update.invitationCode = invitationCode;
+
+    // Update imageUrl if a storageId is provided.
+    if (storageId) {
+      const imageUrl = await storage.getUrl(storageId);
+      if (!imageUrl) throw new Error("Image not found");
+      update.imageUrl = imageUrl;
+      update.storageId = storageId;
+    }
+
+    await db.patch(groupId, update);
   },
 });
+
 export const editSuggestion = mutation({
   args: {
     suggestionId: v.id("suggestions"),
@@ -667,16 +696,34 @@ export const editSuggestion = mutation({
       v.literal("closed")
     ),
     endGoal: v.number(),
+    storageId: v.optional(v.id("_storage")),
   },
-  handler: async (ctx, { suggestionId, invitationCode, status, endGoal }) => {
-    const { db } = ctx;
+  handler: async (
+    ctx,
+    { suggestionId, invitationCode, status, endGoal, storageId }
+  ) => {
+    const { db, storage } = ctx;
     const currentUser = await getAuthenticatedUser(ctx);
 
     const suggestion = await db.get(suggestionId);
     if (!suggestion) throw new Error("Suggestion not found");
-
     if (suggestion.userId !== currentUser._id) throw new Error("Unauthorized");
 
-    await db.patch(suggestionId, { invitationCode, status, endGoal });
+    // Build update object.
+    const update: Record<string, any> = {
+      invitationCode,
+      status,
+      endGoal,
+    };
+
+    // Update imageUrl if a storageId is provided.
+    if (storageId) {
+      const imageUrl = await storage.getUrl(storageId);
+      if (!imageUrl) throw new Error("Image not found");
+      update.imageUrl = imageUrl;
+      update.storageId = storageId;
+    }
+
+    await db.patch(suggestionId, update);
   },
 });

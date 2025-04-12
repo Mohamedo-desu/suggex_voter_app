@@ -25,6 +25,8 @@ export interface GroupProps {
   role: string;
   approvedCount: number;
   rejectedCount: number;
+  storageId: string;
+  imageUrl: string;
 }
 
 /** Group Invitations table: many-to-many relationship between groups and users. */

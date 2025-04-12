@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 15,
     gap: 10,
   },
-  groupHeader: { flexDirection: "row", alignItems: "center", gap: 5 },
+  groupHeader: { flex: 1, flexDirection: "row", alignItems: "center", gap: 5 },
   groupLogo: {
     width: 35,
     height: 35,
@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
+    marginLeft: 5,
   },
   statsContainer: {
     flexDirection: "row",

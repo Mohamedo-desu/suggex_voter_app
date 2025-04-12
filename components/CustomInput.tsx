@@ -31,9 +31,6 @@ const CustomInput: FC<CustomInputProps> = ({
   handleChange,
   handleBlur,
   style,
-  autoComplete,
-  maxLength,
-  keyboardType = "default",
   ...rest
 }) => {
   return (
@@ -43,7 +40,6 @@ const CustomInput: FC<CustomInputProps> = ({
           value={value}
           onChangeText={handleChange}
           onBlur={handleBlur}
-          keyboardType={keyboardType}
           cursorColor={Colors.primary}
           placeholder={placeholder}
           style={[styles.input, style]}

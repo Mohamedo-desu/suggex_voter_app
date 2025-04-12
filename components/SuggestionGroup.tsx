@@ -42,6 +42,7 @@ const SuggestionGroup: React.FC<{
     rejectedCount,
     role,
     status,
+    imageUrl,
   } = item || {};
 
   const groupActive: boolean = status === "open";
@@ -77,6 +78,10 @@ const SuggestionGroup: React.FC<{
     [statusColor, groupActive, isPrivate, isOwner]
   );
 
+  const imageSource = imageUrl
+    ? imageUrl
+    : require("@/assets/icons/avatar.png");
+
   return (
     <Animated.View
       entering={SlideInDown.delay(index * 100)}
@@ -107,7 +112,11 @@ const SuggestionGroup: React.FC<{
         <View style={styles.headerContainer}>
           <View style={styles.groupHeader}>
             <Image
-              source={require("@/assets/icons/avatar.png")}
+              source={
+                typeof imageSource === "string"
+                  ? { uri: imageSource }
+                  : imageSource
+              }
               contentFit="contain"
               style={styles.groupLogo}
               transition={300}

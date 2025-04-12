@@ -3,7 +3,11 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import styles from "@/styles/groupDetailsCard.styles";
 import { GroupProps } from "@/types";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useMutation } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -21,17 +25,20 @@ import {
 import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
 
+interface GroupDetailsCardProps {
+  item: GroupProps;
+  openEditSheet: () => void;
+  openImagePickerSheet: () => void;
+}
+
 const GroupDetailsCard = ({
   item,
   openEditSheet,
-}: {
-  item: GroupProps;
-  openEditSheet: () => void;
-}) => {
+  openImagePickerSheet,
+}: GroupDetailsCardProps) => {
   if (!item) return null;
 
   const [showAlert, setShowAlert] = useState(false);
-
   const [deleting, setDeleting] = useState(false);
 
   const deleteGroup = useMutation(api.suggestion.deleteGroup);
@@ -44,6 +51,8 @@ const GroupDetailsCard = ({
     suggestionsCount,
     approvedCount,
     rejectedCount,
+    imageUrl,
+    invitationCode,
   } = item;
   const isActive = status === "open";
   const creationTimeFormatted = formatDistanceToNowStrict(_creationTime, {
@@ -63,6 +72,7 @@ const GroupDetailsCard = ({
       setDeleting(false);
     }
   };
+
   const onPressDelete = () => {
     if (Platform.OS === "web") {
       setShowAlert(true);
@@ -71,34 +81,53 @@ const GroupDetailsCard = ({
         "Delete",
         "Are you sure you want to delete this suggestion? This action cannot be undone",
         [
-          {
-            text: "No, cancel",
-            onPress: undefined,
-            style: "cancel",
-          },
-          {
-            text: "Yes, delete",
-            onPress: () => handleDelete(),
-            style: "destructive",
-          },
+          { text: "No, cancel", onPress: undefined, style: "cancel" },
+          { text: "Yes, delete", onPress: handleDelete, style: "destructive" },
         ]
       );
     }
   };
 
+  const imageSource = imageUrl
+    ? imageUrl
+    : require("@/assets/icons/avatar.png");
+
   return (
     <>
       <View style={styles.listHeaderContainer}>
         <View style={styles.headerContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Image
-              source={require("@/assets/icons/avatar.png")}
-              contentFit="contain"
-              style={styles.groupLogo}
-              transition={300}
-            />
-            <View>
-              <Text style={styles.groupNameText}>{groupName}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              flex: 1,
+            }}
+          >
+            <TouchableOpacity
+              onPress={openImagePickerSheet}
+              style={styles.imageContainer}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={
+                  typeof imageSource === "string"
+                    ? { uri: imageSource }
+                    : imageSource
+                }
+                contentFit="contain"
+                style={styles.groupLogo}
+                transition={300}
+              />
+              {/* Overlay icon to indicate tap-to-change */}
+              <View style={styles.cameraOverlay}>
+                <Ionicons name="camera" size={16} color="white" />
+              </View>
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.groupNameText} numberOfLines={2}>
+                {groupName}
+              </Text>
               <Text
                 style={[
                   styles.groupStatusText,
@@ -153,11 +182,11 @@ const GroupDetailsCard = ({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Invitation Code: </Text>
           <Text style={styles.detailValue}>
-            {item.invitationCode.substring(0, 15)}...
+            {invitationCode.substring(0, 15)}...
           </Text>
           <TouchableOpacity
             style={styles.copyButton}
-            onPress={() => Clipboard.setString(item.invitationCode)}
+            onPress={() => Clipboard.setString(invitationCode)}
           >
             <FontAwesome5 name="copy" size={14} color={Colors.primary} />
           </TouchableOpacity>

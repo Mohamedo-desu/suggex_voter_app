@@ -77,6 +77,17 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Regular,
     color: Colors.primary,
   },
+  imageContainer: {
+    position: "relative",
+  },
+  cameraOverlay: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    padding: 2,
+  },
 });
 
 export default styles;

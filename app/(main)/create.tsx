@@ -252,6 +252,7 @@ const CreateScreen = () => {
               handleChange={setNewGroupName}
               autoCapitalize="none"
               autoCorrect={false}
+              maxLength={40}
             />
             <View style={styles.pickerContainer}>
               <Picker
