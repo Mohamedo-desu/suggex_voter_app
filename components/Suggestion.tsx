@@ -20,15 +20,19 @@ import {
 import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
 import Animated, {
+  LinearTransition,
+  SlideInDown,
+  SlideOutLeft,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 
-const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
-  item,
-  userId,
-}) => {
+const Suggestion: FC<{
+  item: SuggestionProps;
+  userId: string;
+  index: number;
+}> = ({ item, userId, index }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -126,7 +130,12 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
   }));
 
   return (
-    <>
+    <Animated.View
+      entering={SlideInDown.delay(index * 100)}
+      exiting={SlideOutLeft}
+      layout={LinearTransition}
+      style={{ marginHorizontal: 15 }}
+    >
       <TouchableOpacity
         style={[styles.container, { opacity: isClosed && !isOwner ? 0.5 : 1 }]}
         activeOpacity={0.8}
@@ -250,7 +259,7 @@ const Suggestion: FC<{ item: SuggestionProps; userId: string }> = ({
         onCancelPressed={() => setShowAlert(false)}
         onConfirmPressed={() => handleDelete()}
       />
-    </>
+    </Animated.View>
   );
 };
 

@@ -2,7 +2,7 @@ import Colors from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity } from "react-native";
 
 const TabsLayout = () => {
   const router = useRouter();
@@ -14,6 +14,8 @@ const TabsLayout = () => {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.placeholderText,
         tabBarStyle: styles.tabBarStyle,
+        tabBarButton: (props) => <Pressable {...props} android_ripple={null} />,
+        headerShadowVisible: false,
       }}
     >
       <Tabs.Screen
@@ -60,10 +62,9 @@ export default TabsLayout;
 const styles = StyleSheet.create({
   tabBarStyle: {
     backgroundColor: Colors.background,
-    borderTopWidth: 0,
     position: "absolute",
-    elevation: 10,
     height: 40,
     paddingBottom: 8,
+    elevation: 0,
   },
 });

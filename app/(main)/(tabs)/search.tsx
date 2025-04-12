@@ -105,8 +105,6 @@ const SearchScreen: React.FC = () => {
   const handlePaste = async () => {
     const copiedText = await Clipboard.getString();
 
-    console.log(copiedText);
-
     const isGroup = copiedText.startsWith("grp") && copiedText.endsWith("G0g");
     const isSuggestion =
       copiedText.startsWith("sug") && copiedText.endsWith("S0s");

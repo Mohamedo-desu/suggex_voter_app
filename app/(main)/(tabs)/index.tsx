@@ -11,12 +11,12 @@ import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   Platform,
   RefreshControl,
   TouchableOpacity,
 } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
+import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 
 const SuggestionsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -33,9 +33,9 @@ const SuggestionsScreen = () => {
     setRefreshing(false);
   };
 
-  const renderItem = ({ item }: { item: GroupProps }) => {
+  const renderItem = ({ item, index }: { item: GroupProps; index: number }) => {
     if (!userId) return null;
-    return <SuggestionGroup item={item} userId={userId} />;
+    return <SuggestionGroup item={item} userId={userId} index={index} />;
   };
   const navigation = useNavigation();
 
@@ -82,7 +82,7 @@ const SuggestionsScreen = () => {
 
   return (
     <>
-      <FlatList
+      <Animated.FlatList
         data={groups}
         refreshControl={
           <RefreshControl
@@ -97,6 +97,7 @@ const SuggestionsScreen = () => {
         renderItem={renderItem}
         contentContainerStyle={{ flexGrow: 1, padding: 15, gap: 10 }}
         ListEmptyComponent={<Empty text="No suggestion groups found!" />}
+        itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
       />
       <AwesomeAlert
         show={showAlert}

@@ -12,6 +12,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 15,
     gap: 10,
   },
+  groupHeader: { flexDirection: "row", alignItems: "center", gap: 5 },
+  groupLogo: {
+    width: 35,
+    height: 35,
+    borderRadius: 50,
+  },
   iconContainer: {
     position: "absolute",
     right: -3,
@@ -24,10 +30,9 @@ export const styles = StyleSheet.create({
     gap: 15,
   },
   groupNameText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.Bold,
     color: Colors.textDark,
-    flex: 1,
   },
   timeText: {
     fontSize: 10,

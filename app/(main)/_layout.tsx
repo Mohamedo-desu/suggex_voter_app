@@ -8,7 +8,7 @@ const MainLayout = () => {
   if (!user) return <Redirect href={"/(auth)"} />;
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShadowVisible: false }}>
       <Stack.Screen
         name="(tabs)"
         options={{

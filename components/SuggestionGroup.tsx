@@ -6,6 +6,7 @@ import { GroupProps } from "@/types";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { formatDistanceToNowStrict } from "date-fns";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import {
@@ -17,11 +18,17 @@ import {
   ViewStyle,
 } from "react-native";
 import AnimatedNumber from "react-native-animated-numbers";
+import Animated, {
+  LinearTransition,
+  SlideInDown,
+  SlideOutLeft,
+} from "react-native-reanimated";
 
-const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
-  item,
-  userId,
-}) => {
+const SuggestionGroup: React.FC<{
+  item: GroupProps;
+  userId: string;
+  index: number;
+}> = ({ item, userId, index }) => {
   const router = useRouter();
 
   if (!item) return null;
@@ -71,7 +78,11 @@ const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
   );
 
   return (
-    <>
+    <Animated.View
+      entering={SlideInDown.delay(index * 100)}
+      exiting={SlideOutLeft}
+      layout={LinearTransition}
+    >
       <TouchableOpacity
         style={[
           styles.container,
@@ -94,13 +105,21 @@ const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
           />
         </View>
         <View style={styles.headerContainer}>
-          <Text
-            style={styles.groupNameText}
-            ellipsizeMode="tail"
-            numberOfLines={1}
-          >
-            {displayName}
-          </Text>
+          <View style={styles.groupHeader}>
+            <Image
+              source={require("@/assets/icons/avatar.png")}
+              contentFit="contain"
+              style={styles.groupLogo}
+              transition={300}
+            />
+            <Text
+              style={styles.groupNameText}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
+              {displayName}
+            </Text>
+          </View>
           <Text style={styles.timeText}>
             {formatDistanceToNowStrict(new Date(_creationTime), {
               addSuffix: false,
@@ -144,7 +163,7 @@ const SuggestionGroup: React.FC<{ item: GroupProps; userId: string }> = ({
           {item?.status === "open" ? "Active" : item?.status}
         </Text>
       </View>
-    </>
+    </Animated.View>
   );
 };
 

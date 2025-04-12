@@ -5,7 +5,7 @@ const PROJECT_SLUG = "suggex";
 const OWNER = "mohamedo-desu";
 
 // App production config
-const APP_NAME = "Suggestion Box";
+const APP_NAME = "Suggestions Box";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
 const ICON = "./assets/icons/icon.png";
@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "1.0.0",
+    version: "2.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     newArchEnabled: true,
