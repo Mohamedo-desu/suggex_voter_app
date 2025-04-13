@@ -79,6 +79,7 @@ const CreateScreen = () => {
       console.log("error in creating group", error);
     } finally {
       setAddingNewGroup(false);
+
       closeEditSheet();
     }
   };

@@ -21,11 +21,11 @@ import AnimatedNumber from "react-native-animated-numbers";
 import AwesomeAlert from "react-native-awesome-alerts";
 import Animated, {
   LinearTransition,
-  SlideInDown,
-  SlideOutLeft,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  ZoomIn,
+  ZoomOut,
 } from "react-native-reanimated";
 
 const Suggestion: FC<{
@@ -131,8 +131,8 @@ const Suggestion: FC<{
 
   return (
     <Animated.View
-      entering={SlideInDown.delay(index * 100)}
-      exiting={SlideOutLeft}
+      entering={ZoomIn.delay(index * 100)}
+      exiting={ZoomOut}
       layout={LinearTransition}
       style={{ marginHorizontal: 10 }}
     >

@@ -95,7 +95,12 @@ const SuggestionsScreen = () => {
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
-        contentContainerStyle={{ flexGrow: 1, padding: 15, gap: 10 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          padding: 15,
+          gap: 10,
+          paddingBottom: 50,
+        }}
         ListEmptyComponent={<Empty text="No suggestion groups found!" />}
         itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
       />

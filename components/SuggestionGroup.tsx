@@ -20,8 +20,8 @@ import {
 import AnimatedNumber from "react-native-animated-numbers";
 import Animated, {
   LinearTransition,
-  SlideInDown,
-  SlideOutLeft,
+  ZoomIn,
+  ZoomOut,
 } from "react-native-reanimated";
 
 const SuggestionGroup: React.FC<{
@@ -84,8 +84,8 @@ const SuggestionGroup: React.FC<{
 
   return (
     <Animated.View
-      entering={SlideInDown.delay(index * 100)}
-      exiting={SlideOutLeft}
+      entering={ZoomIn.delay(index * 100)}
+      exiting={ZoomOut}
       layout={LinearTransition}
     >
       <TouchableOpacity

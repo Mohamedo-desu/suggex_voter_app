@@ -110,7 +110,7 @@ const SuggestionDetails: FC = () => {
           ListEmptyComponent={<Empty text="No comments found" />}
           contentContainerStyle={[
             styles.contentContainer,
-            { paddingBottom: 0 },
+            { paddingBottom: 50 },
           ]}
           showsVerticalScrollIndicator={false}
           itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
