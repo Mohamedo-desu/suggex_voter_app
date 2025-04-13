@@ -10,7 +10,7 @@ import * as Updates from "expo-updates";
 import React, { useEffect } from "react";
 import { LogBox, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 LogBox.ignoreLogs(["Clerk: Clerk has been loaded with development keys."]);
 
@@ -88,13 +88,12 @@ const RootLayout: React.FC = () => {
 
   return (
     <ClerkAndConvexProvider>
-      <SafeAreaProvider>
-        <SafeAreaView style={[styles.container]}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <InitialLayout />
-          </GestureHandlerRootView>
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <SafeAreaView style={[styles.container]}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <InitialLayout />
+        </GestureHandlerRootView>
+      </SafeAreaView>
+
       <StatusBar style="dark" backgroundColor={Colors.background} />
     </ClerkAndConvexProvider>
   );

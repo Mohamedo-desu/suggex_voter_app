@@ -5,7 +5,6 @@ import { Platform, StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   contentContainer: {
     gap: 10,
-    paddingBottom: 40,
   },
   resultHeader: {
     fontSize: 12,

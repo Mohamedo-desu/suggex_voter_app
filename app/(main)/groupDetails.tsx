@@ -108,7 +108,6 @@ const GroupDetails: FC = () => {
     if (!result.canceled) {
       await uploadImage(result.assets[0].uri);
     }
-    imageBottomSheetRef.current?.close();
   };
 
   // Handle gallery image selection
@@ -127,7 +126,6 @@ const GroupDetails: FC = () => {
     if (!result.canceled) {
       await uploadImage(result.assets[0].uri);
     }
-    imageBottomSheetRef.current?.close();
   };
 
   const uploadImage = async (uri: string) => {
@@ -161,6 +159,7 @@ const GroupDetails: FC = () => {
         groupId: groupId as Id<"groups">,
         storageId,
       });
+      imageBottomSheetRef.current?.close();
     } catch (error) {
       console.error("Image upload failed", error);
       Alert.alert("Upload failed", "Could not upload image, please try again.");

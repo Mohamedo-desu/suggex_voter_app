@@ -20,6 +20,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SuggestionDetails: FC = () => {
   const { suggestionId } = useLocalSearchParams();
@@ -92,6 +93,9 @@ const SuggestionDetails: FC = () => {
   const isOwner = suggestionDetails?.userId === currentUser?._id;
   const showCommentInput = suggestionDetails?.status === "open";
 
+  const { bottom, top } = useSafeAreaInsets();
+  console.log(bottom);
+
   const renderCommentSection = () => (
     <>
       <SuggestionDetailsStickyHeader
@@ -104,7 +108,10 @@ const SuggestionDetails: FC = () => {
           keyExtractor={(item) => item._id}
           renderItem={renderComment}
           ListEmptyComponent={<Empty text="No comments found" />}
-          contentContainerStyle={styles.contentContainer}
+          contentContainerStyle={[
+            styles.contentContainer,
+            { paddingBottom: 0 },
+          ]}
           showsVerticalScrollIndicator={false}
           itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
           ListHeaderComponent={
