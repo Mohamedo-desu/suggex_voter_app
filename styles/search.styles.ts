@@ -1,67 +1,67 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  footerContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
   header: {
     padding: 15,
   },
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.lightGray[300],
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    height: 50,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.textDark,
-    paddingVertical: 10,
-  },
   iconWrapper: {
     padding: 5,
+  },
+  joinButton: {
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 5,
+    justifyContent: 'center',
+    padding: 15,
+    width: '100%',
+  },
+  joinButtonText: {
+    color: Colors.white,
+    fontFamily: Fonts.Medium,
+    fontSize: 16,
   },
   pasteButton: {
     marginTop: 15,
   },
   pasteButtonText: {
     color: Colors.white,
-    fontSize: 14,
     fontFamily: Fonts.Regular,
+    fontSize: 14,
+  },
+  resultHeader: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Bold,
+    fontSize: 20,
+    marginBottom: 5,
   },
   resultsContainer: {
     flex: 1,
     padding: 15,
   },
-  resultHeader: {
-    fontSize: 20,
+  searchInput: {
     color: Colors.textDark,
-    fontFamily: Fonts.Bold,
-    marginBottom: 5,
-  },
-  footerContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 20,
+    fontSize: 14,
+    paddingVertical: 10,
   },
-  joinButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.primary,
+  searchRow: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightGray[300],
     borderRadius: 5,
-    width: "100%",
-    padding: 15,
-  },
-  joinButtonText: {
-    color: Colors.white,
-    fontSize: 16,
-    fontFamily: Fonts.Medium,
+    flexDirection: 'row',
+    height: 50,
+    paddingHorizontal: 10,
   },
 });
 

@@ -1,6 +1,4 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import React, { FC } from "react";
+import React, { FC } from 'react';
 import {
   NativeSyntheticEvent,
   StyleProp,
@@ -11,7 +9,9 @@ import {
   TextInputProps,
   TextStyle,
   View,
-} from "react-native";
+} from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 interface CustomInputProps extends TextInputProps {
   placeholder: string;
@@ -55,25 +55,25 @@ const CustomInput: FC<CustomInputProps> = ({
 export default CustomInput;
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.inputBackground,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: 15,
+  error: {
+    color: Colors.error,
+    fontFamily: Fonts.Medium,
+    fontSize: 13,
   },
   input: {
+    color: Colors.textDark,
     flex: 1,
     fontFamily: Fonts.Regular,
     fontSize: 12,
-    color: Colors.textDark,
   },
-  error: {
-    color: Colors.error,
-    fontSize: 13,
-    fontFamily: Fonts.Medium,
+  inputContainer: {
+    alignItems: 'center',
+    backgroundColor: Colors.inputBackground,
+    borderColor: Colors.border,
+    borderRadius: 5,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 15,
   },
 });

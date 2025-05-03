@@ -1,146 +1,146 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.background,
-    padding: 10,
-    marginTop: 5,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  groupStatusText: {
-    fontSize: 12,
-    fontFamily: Fonts.Medium,
-    marginBottom: 8,
-  },
-  title: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: Fonts.Bold,
-    color: Colors.textDark,
-  },
+  actionButton: {},
   actionButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
   },
-  actionButton: {},
-  description: {
-    fontSize: 12,
-    fontFamily: Fonts.Medium,
-    color: Colors.textDark,
-    marginBottom: 8,
-  },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  detailLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.placeholderText,
-  },
-  detailValue: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.textDark,
+  container: {
+    backgroundColor: Colors.background,
+    marginTop: 5,
+    padding: 10,
   },
   copyButton: {
     marginLeft: 10,
   },
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  statLabel: {
+  description: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Medium,
     fontSize: 12,
-    fontFamily: Fonts.Regular,
+    marginBottom: 8,
+  },
+  detailLabel: {
     color: Colors.placeholderText,
-    marginRight: 4,
-  },
-  statNumber: {
-    fontSize: 12,
     fontFamily: Fonts.Regular,
-    color: Colors.primary,
-  },
-  progressWrapper: {
-    marginTop: 15,
-  },
-  progressBar: {
-    height: 5,
-    backgroundColor: Colors.lightGray[200],
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: Colors.primary,
-  },
-  progressFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  progressText: {
     fontSize: 12,
+  },
+  detailRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  detailValue: {
+    color: Colors.textDark,
     fontFamily: Fonts.Regular,
-    color: Colors.textDark,
+    fontSize: 12,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
+  groupStatusText: {
+    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    marginBottom: 8,
   },
-  modalContent: {
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  modalTitle: {
-    color: Colors.textDark,
-    fontSize: 16,
-    fontFamily: Fonts.Bold,
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputLabel: {
     color: Colors.textDark,
-    marginBottom: 8,
-    fontSize: 12,
     fontFamily: Fonts.Regular,
-  },
-
-  pickerContainer: {
-    overflow: "hidden",
-    backgroundColor: Colors.cardBackground,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingHorizontal: 15,
-    paddingVertical: Platform.OS === "web" ? 15 : 0,
+    fontSize: 12,
+    marginBottom: 8,
   },
   invitationRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    padding: 20,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Bold,
+    fontSize: 16,
+  },
+  pickerContainer: {
+    backgroundColor: Colors.cardBackground,
+    borderColor: Colors.border,
+    borderRadius: 5,
+    borderWidth: 1,
+    overflow: 'hidden',
+    paddingHorizontal: 15,
+    paddingVertical: Platform.OS === 'web' ? 15 : 0,
+  },
+  progressBar: {
+    backgroundColor: Colors.lightGray[200],
+    borderRadius: 20,
+    height: 5,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    backgroundColor: Colors.primary,
+    height: '100%',
+  },
+  progressFooter: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  progressText: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  progressWrapper: {
+    marginTop: 15,
+  },
+  statItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginRight: 15,
+  },
+  statLabel: {
+    color: Colors.placeholderText,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+    marginRight: 4,
+  },
+  statNumber: {
+    color: Colors.primary,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+
+  statsContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  title: {
+    color: Colors.textDark,
+    flex: 1,
+    fontFamily: Fonts.Bold,
+    fontSize: 16,
   },
 });
 

@@ -1,7 +1,7 @@
-import { httpRouter } from "convex/server";
-import { Webhook } from "svix";
-import { api } from "./_generated/api";
-import { httpAction } from "./_generated/server";
+import { httpRouter } from 'convex/server';
+import { Webhook } from 'svix';
+import { api } from './_generated/api';
+import { httpAction } from './_generated/server';
 
 const http = httpRouter();
 
@@ -10,24 +10,24 @@ const http = httpRouter();
 // 3- IF THE EVENT IS USER.CREATED WE WILL CREATE THE USER IN THE DATABASE
 
 http.route({
-  path: "/clerk-webhook",
-  method: "POST",
+  path: '/clerk-webhook',
+  method: 'POST',
   handler: httpAction(async (ctx, request) => {
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
       throw new Error(
-        "Missing webhook secret. Please set CLERK_WEBHOOK_SECRET in your .env.local file."
+        'Missing webhook secret. Please set CLERK_WEBHOOK_SECRET in your .env.local file.'
       );
     }
 
     //   CHECK HEADERS
-    const svix_id = request.headers.get("svix-id");
-    const svix_signature = request.headers.get("svix-signature");
-    const svix_timestamp = request.headers.get("svix-timestamp");
+    const svix_id = request.headers.get('svix-id');
+    const svix_signature = request.headers.get('svix-signature');
+    const svix_timestamp = request.headers.get('svix-timestamp');
 
     if (!svix_id || !svix_signature || !svix_timestamp) {
-      return new Response("Missing svix headers", {
+      return new Response('Missing svix headers', {
         status: 400,
       });
     }
@@ -41,20 +41,20 @@ http.route({
 
     try {
       evt = wh.verify(body, {
-        "svix-id": svix_id,
-        "svix-timestamp": svix_timestamp,
-        "svix-signature": svix_signature,
+        'svix-id': svix_id,
+        'svix-timestamp': svix_timestamp,
+        'svix-signature': svix_signature,
       }) as any;
     } catch (error) {
-      console.error("Error verifying webhook", error);
-      return new Response("Error occurred", {
+      console.error('Error verifying webhook', error);
+      return new Response('Error occurred', {
         status: 400,
       });
     }
 
     const eventType = evt.type;
 
-    if (eventType === "user.created") {
+    if (eventType === 'user.created') {
       const { id, email_addresses } = evt.data;
 
       const email = email_addresses[0].email_address;
@@ -65,13 +65,13 @@ http.route({
           clerkId: id,
         });
       } catch (error) {
-        console.log("Error creating user", error);
-        return new Response("Error occurred", {
+        console.log('Error creating user', error);
+        return new Response('Error occurred', {
           status: 500,
         });
       }
     }
-    return new Response("Webhook processed successfully", { status: 200 });
+    return new Response('Webhook processed successfully', { status: 200 });
   }),
 });
 

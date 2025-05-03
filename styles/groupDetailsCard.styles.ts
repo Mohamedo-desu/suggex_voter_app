@@ -1,92 +1,92 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 const styles = StyleSheet.create({
-  listHeaderContainer: {
-    backgroundColor: Colors.background,
-    padding: 10,
-    marginTop: 5,
-  },
-  groupLogo: {
-    width: 60,
-    height: 60,
-    borderRadius: 50,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  leftHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  groupNameText: {
-    fontSize: 13,
-    fontFamily: Fonts.Bold,
-    color: Colors.textDark,
-  },
   actionButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 15,
   },
-  editButton: {},
-  deleteButton: {},
-  groupStatusText: {
-    fontSize: 12,
-    fontFamily: Fonts.Medium,
-  },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  detailLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.placeholderText,
-  },
-  detailValue: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.textDark,
+  cameraOverlay: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    bottom: 0,
+    padding: 2,
+    position: 'absolute',
+    right: 0,
   },
   copyButton: {
     marginLeft: 15,
   },
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 10,
-  },
-  statItemContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
+  deleteButton: {},
+  detailLabel: {
     color: Colors.placeholderText,
-  },
-  statNumber: {
-    fontSize: 12,
     fontFamily: Fonts.Regular,
-    color: Colors.primary,
+    fontSize: 12,
+  },
+  detailRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 2,
+  },
+  detailValue: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  editButton: {},
+  groupLogo: {
+    borderRadius: 50,
+    height: 60,
+    width: 60,
+  },
+  groupNameText: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Bold,
+    fontSize: 13,
+  },
+  groupStatusText: {
+    fontFamily: Fonts.Medium,
+    fontSize: 12,
+  },
+  headerContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   imageContainer: {
-    position: "relative",
+    position: 'relative',
   },
-  cameraOverlay: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    padding: 2,
+  leftHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  listHeaderContainer: {
+    backgroundColor: Colors.background,
+    marginTop: 5,
+    padding: 10,
+  },
+  statItemContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  statLabel: {
+    color: Colors.placeholderText,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  statNumber: {
+    color: Colors.primary,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  statsContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
   },
 });
 

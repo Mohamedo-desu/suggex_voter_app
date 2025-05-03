@@ -1,6 +1,4 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import React, { FC } from "react";
+import React, { FC } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -8,7 +6,9 @@ import {
   TextStyle,
   TouchableOpacity,
   ViewStyle,
-} from "react-native";
+} from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 interface CustomButtonProps {
   text: string;
@@ -18,13 +18,7 @@ interface CustomButtonProps {
   textStyle?: TextStyle;
 }
 
-const CustomButton: FC<CustomButtonProps> = ({
-  text,
-  onPress,
-  loading,
-  style,
-  textStyle = {},
-}) => {
+const CustomButton: FC<CustomButtonProps> = ({ text, onPress, loading, style, textStyle = {} }) => {
   return (
     <TouchableOpacity
       style={[styles.button, style]}
@@ -33,7 +27,7 @@ const CustomButton: FC<CustomButtonProps> = ({
       disabled={loading}
     >
       {loading ? (
-        <ActivityIndicator size={"small"} color="#fff" />
+        <ActivityIndicator size={'small'} color="#fff" />
       ) : (
         <Text style={[styles.buttonText, textStyle]}>{text}</Text>
       )}
@@ -45,16 +39,16 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: 'center',
     backgroundColor: Colors.primary,
     borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    justifyContent: 'center',
     padding: 10,
   },
   buttonText: {
-    textAlign: "center",
     color: Colors.white,
-    fontSize: 14,
     fontFamily: Fonts.Medium,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

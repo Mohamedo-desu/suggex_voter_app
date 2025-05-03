@@ -1,26 +1,19 @@
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import SuggestionGroup from "@/components/SuggestionGroup";
-import Colors from "@/constants/colors";
-import { api } from "@/convex/_generated/api";
-import { GroupProps } from "@/types";
-import { useAuth } from "@clerk/clerk-expo";
-import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "convex/react";
-import { useNavigation } from "expo-router";
-import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Platform,
-  RefreshControl,
-  TouchableOpacity,
-} from "react-native";
-import AwesomeAlert from "react-native-awesome-alerts";
-import Animated, { Easing, LinearTransition } from "react-native-reanimated";
+import { useAuth } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from 'convex/react';
+import { useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, RefreshControl, TouchableOpacity } from 'react-native';
+import Animated, { Easing, LinearTransition } from 'react-native-reanimated';
+import Empty from '@/components/Empty';
+import Loader from '@/components/Loader';
+import SuggestionGroup from '@/components/SuggestionGroup';
+import Colors from '@/constants/Colors';
+import { api } from '@/convex/_generated/api';
+import { GroupProps } from '@/types';
 
 const SuggestionsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
 
   const { signOut } = useAuth();
 
@@ -40,22 +33,18 @@ const SuggestionsScreen = () => {
   const navigation = useNavigation();
 
   const handleLogOut = async () => {
-    if (Platform.OS === "web") {
-      setShowAlert(true);
-    } else {
-      Alert.alert("Log Out", "Are you sure you want to log out?", [
-        {
-          text: "No, cancel",
-          onPress: undefined,
-          style: "cancel",
-        },
-        {
-          text: "Yes, logout",
-          onPress: () => signOut(),
-          style: "destructive",
-        },
-      ]);
-    }
+    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+      {
+        text: 'No, cancel',
+        onPress: undefined,
+        style: 'cancel',
+      },
+      {
+        text: 'Yes, logout',
+        onPress: () => signOut(),
+        style: 'destructive',
+      },
+    ]);
   };
   useEffect(() => {
     navigation.setOptions({
@@ -66,11 +55,7 @@ const SuggestionsScreen = () => {
           hitSlop={10}
           onPress={handleLogOut}
         >
-          <Ionicons
-            name="log-out-outline"
-            size={25}
-            color={Colors.placeholderText}
-          />
+          <Ionicons name="log-out-outline" size={25} color={Colors.placeholderText} />
         </TouchableOpacity>
       ),
     });
@@ -81,45 +66,28 @@ const SuggestionsScreen = () => {
   }
 
   return (
-    <>
-      <Animated.FlatList
-        data={groups}
-        refreshControl={
-          <RefreshControl
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            colors={[Colors.primary]}
-            tintColor={Colors.primary}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        contentContainerStyle={{
-          flexGrow: 1,
-          padding: 15,
-          gap: 10,
-          paddingBottom: 50,
-        }}
-        ListEmptyComponent={<Empty text="No suggestion groups found!" />}
-        itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
-      />
-      <AwesomeAlert
-        show={showAlert}
-        showProgress={false}
-        title="Log Out"
-        message="Are you sure you want to log out?"
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-        showCancelButton={true}
-        showConfirmButton={true}
-        cancelText="No, cancel"
-        confirmText="Yes, log out"
-        confirmButtonColor={Colors.error}
-        onCancelPressed={() => setShowAlert(false)}
-        onConfirmPressed={() => signOut()}
-      />
-    </>
+    <Animated.FlatList
+      data={groups}
+      refreshControl={
+        <RefreshControl
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+          colors={[Colors.primary]}
+          tintColor={Colors.primary}
+        />
+      }
+      showsVerticalScrollIndicator={false}
+      keyExtractor={item => item._id}
+      renderItem={renderItem}
+      contentContainerStyle={{
+        flexGrow: 1,
+        padding: 15,
+        gap: 10,
+        paddingBottom: 50,
+      }}
+      ListEmptyComponent={<Empty text="No suggestion groups found!" />}
+      itemLayoutAnimation={LinearTransition.easing(Easing.ease).delay(100)}
+    />
   );
 };
 

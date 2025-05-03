@@ -1,12 +1,12 @@
-import { useAuth } from "@clerk/clerk-expo";
-import { Redirect, Stack } from "expo-router";
-import React from "react";
+import { useAuth } from '@clerk/clerk-expo';
+import { Redirect, Stack } from 'expo-router';
+import React from 'react';
 
 const AuthLayout = () => {
   const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) return null;
-  if (isSignedIn) return <Redirect href={"/(main)/(tabs)/suggestions"} />;
+  if (isSignedIn) return <Redirect href={'/(main)/(tabs)'} />;
 
   return (
     <Stack

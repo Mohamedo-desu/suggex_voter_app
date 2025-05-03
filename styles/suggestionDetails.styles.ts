@@ -1,73 +1,73 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    gap: 10,
-  },
-  resultHeader: {
-    fontSize: 12,
-    color: Colors.textDark,
-    fontFamily: Fonts.Medium,
-    marginTop: 10,
-    marginHorizontal: 15,
-  },
   commentContainer: {
     backgroundColor: Colors.background,
+    gap: 10,
     marginTop: 5,
     padding: 10,
-    gap: 10,
     zIndex: -1,
   },
   commentInput: {
     color: Colors.textDark,
-    fontSize: 12,
     fontFamily: Fonts.Regular,
+    fontSize: 12,
     paddingVertical: 10,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  modalTitle: {
-    color: Colors.textDark,
-    fontSize: 16,
-    fontFamily: Fonts.Bold,
+  contentContainer: {
+    gap: 10,
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputLabel: {
     color: Colors.textDark,
-    marginBottom: 8,
-    fontSize: 12,
     fontFamily: Fonts.Regular,
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  invitationRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    padding: 20,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Bold,
+    fontSize: 16,
   },
 
   pickerContainer: {
-    overflow: "hidden",
     backgroundColor: Colors.cardBackground,
+    borderColor: Colors.border,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: Colors.border,
+    overflow: 'hidden',
     paddingHorizontal: 15,
-    paddingVertical: Platform.OS === "web" ? 15 : 0,
+    paddingVertical: Platform.OS === 'web' ? 15 : 0,
   },
-  invitationRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  resultHeader: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Medium,
+    fontSize: 12,
+    marginHorizontal: 15,
+    marginTop: 10,
   },
 });
 

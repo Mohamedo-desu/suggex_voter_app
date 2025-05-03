@@ -1,31 +1,28 @@
-import Empty from "@/components/Empty";
-import GroupDetailsCard from "@/components/GroupDetailsCard";
-import GroupDetailsStickyHeader from "@/components/GroupDetailsStickyHeader";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import Colors from "@/constants/colors";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { styles } from "@/styles/groupDetails.styles";
-import { GroupProps, SuggestionProps } from "@/types";
-import { getMimeType } from "@/utils/mimeType";
-import { useAuth } from "@clerk/clerk-expo";
-import { Ionicons } from "@expo/vector-icons";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { useMutation, useQuery } from "convex/react";
-import * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { FC, useEffect, useMemo, useRef } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { useMutation, useQuery } from 'convex/react';
+import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
   LinearTransition,
   useAnimatedScrollHandler,
   useSharedValue,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
+import Empty from '@/components/Empty';
+import GroupDetailsCard from '@/components/GroupDetailsCard';
+import GroupDetailsStickyHeader from '@/components/GroupDetailsStickyHeader';
+import Loader from '@/components/Loader';
+import Suggestion from '@/components/Suggestion';
+import Colors from '@/constants/Colors';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { styles } from '@/styles/groupDetails.styles';
+import { GroupProps, SuggestionProps } from '@/types';
+import { getMimeType } from '@/utils/mimeType';
 
 const GroupDetails: FC = () => {
   const { groupId } = useLocalSearchParams();
@@ -33,16 +30,13 @@ const GroupDetails: FC = () => {
   const { userId } = useAuth();
 
   // Data queries
-  const currentUser = useQuery(
-    api.user.getUserByClerkId,
-    userId ? { clerkId: userId } : "skip"
-  );
+  const currentUser = useQuery(api.user.getUserByClerkId, userId ? { clerkId: userId } : 'skip');
   const suggestions = useQuery(api.suggestion.fetchSuggestions, {
-    groupId: groupId as Id<"groups">,
+    groupId: groupId as Id<'groups'>,
   }) as SuggestionProps[];
 
   const groupDetails = useQuery(api.suggestion.fetchGroupDetails, {
-    groupId: groupId as Id<"groups">,
+    groupId: groupId as Id<'groups'>,
   }) as GroupProps;
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
 
@@ -50,7 +44,7 @@ const GroupDetails: FC = () => {
 
   // BottomSheet refs
   const imageBottomSheetRef = useRef<BottomSheet>(null);
-  const imageSnapPoints = useMemo(() => ["25%"], []);
+  const imageSnapPoints = useMemo(() => ['25%'], []);
 
   const openImagePickerSheet = () => {
     imageBottomSheetRef.current?.expand();
@@ -59,10 +53,7 @@ const GroupDetails: FC = () => {
   // Redirect if unauthorized or group not found
   useEffect(() => {
     if (!groupDetails) return;
-    if (
-      groupDetails?.status !== "open" &&
-      groupDetails?.userId !== currentUser?._id
-    ) {
+    if (groupDetails?.status !== 'open' && groupDetails?.userId !== currentUser?._id) {
       router.back();
     }
   }, [groupDetails, router, currentUser]);
@@ -75,19 +66,13 @@ const GroupDetails: FC = () => {
   // Reanimated scroll tracking
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
+    onScroll: event => {
       scrollY.value = event.contentOffset.y;
     },
   });
 
   // Render suggestion item
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: SuggestionProps;
-    index: number;
-  }) => {
+  const renderItem = ({ item, index }: { item: SuggestionProps; index: number }) => {
     if (!userId) return null;
     return <Suggestion item={item} userId={userId} index={index} />;
   };
@@ -95,12 +80,12 @@ const GroupDetails: FC = () => {
   // Handle camera image selection
   const handleCameraPick = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Camera permissions are required to take a photo.");
+    if (status !== 'granted') {
+      Alert.alert('Camera permissions are required to take a photo.');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: "images",
+      mediaTypes: 'images',
       allowsEditing: true,
       quality: 0.7,
       aspect: [1, 1],
@@ -113,12 +98,12 @@ const GroupDetails: FC = () => {
   // Handle gallery image selection
   const handleGalleryPick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Media library permissions are required to select an image.");
+    if (status !== 'granted') {
+      Alert.alert('Media library permissions are required to select an image.');
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
+      mediaTypes: 'images',
       allowsEditing: true,
       quality: 0.7,
       aspect: [1, 1],
@@ -139,9 +124,9 @@ const GroupDetails: FC = () => {
 
       // Upload the blob to the generated URL.
       const uploadResult = await fetch(uploadUrl, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": getMimeType(uri),
+          'Content-Type': getMimeType(uri),
         },
         body: imageBlob,
       });
@@ -149,20 +134,20 @@ const GroupDetails: FC = () => {
       // Check for a successful upload.
       if (uploadResult.status !== 200) {
         const errorText = await uploadResult.text();
-        throw new Error("Image upload failed: " + errorText);
+        throw new Error('Image upload failed: ' + errorText);
       }
 
       // Parse the JSON response.
       const { storageId } = await uploadResult.json();
 
       await editGroup({
-        groupId: groupId as Id<"groups">,
+        groupId: groupId as Id<'groups'>,
         storageId,
       });
       imageBottomSheetRef.current?.close();
     } catch (error) {
-      console.error("Image upload failed", error);
-      Alert.alert("Upload failed", "Could not upload image, please try again.");
+      console.error('Image upload failed', error);
+      Alert.alert('Upload failed', 'Could not upload image, please try again.');
     }
   };
 
@@ -175,17 +160,14 @@ const GroupDetails: FC = () => {
       {groupDetails && (
         <Animated.FlatList
           data={suggestions}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           renderItem={renderItem}
           ListEmptyComponent={<Empty text="No suggestions found" />}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
-              <GroupDetailsCard
-                item={groupDetails}
-                openImagePickerSheet={openImagePickerSheet}
-              />
+              <GroupDetailsCard item={groupDetails} openImagePickerSheet={openImagePickerSheet} />
               <Text style={styles.resultHeader}>Suggestions</Text>
             </>
           }
@@ -201,7 +183,7 @@ const GroupDetails: FC = () => {
         index={-1}
         snapPoints={imageSnapPoints}
         enablePanDownToClose
-        backdropComponent={(props) => (
+        backdropComponent={props => (
           <BottomSheetBackdrop
             {...props}
             disappearsOnIndex={-1}
@@ -214,16 +196,10 @@ const GroupDetails: FC = () => {
         <BottomSheetView style={styles.imagePickerContainer}>
           <Text style={styles.imagePickerTitle}>Select Image</Text>
           <View style={styles.imagePickerOptions}>
-            <TouchableOpacity
-              onPress={handleCameraPick}
-              style={styles.iconButton}
-            >
+            <TouchableOpacity onPress={handleCameraPick} style={styles.iconButton}>
               <Ionicons name="camera" size={30} color={Colors.white} />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleGalleryPick}
-              style={styles.iconButton}
-            >
+            <TouchableOpacity onPress={handleGalleryPick} style={styles.iconButton}>
               <Ionicons name="image" size={30} color={Colors.white} />
             </TouchableOpacity>
           </View>

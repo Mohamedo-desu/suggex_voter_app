@@ -1,13 +1,13 @@
-import CustomButton from "@/components/CustomButton";
-import PrivacyTerms from "@/components/PrivacyTerms";
-import Colors from "@/constants/colors";
-import { styles } from "@/styles/auth.styles";
-import { useSSO } from "@clerk/clerk-expo";
-import { FontAwesome5 } from "@expo/vector-icons";
-import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
-import React from "react";
-import { Image, Text, View } from "react-native";
+import { useSSO } from '@clerk/clerk-expo';
+import { FontAwesome5 } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, Text, View } from 'react-native';
+import CustomButton from '@/components/CustomButton';
+import PrivacyTerms from '@/components/PrivacyTerms';
+import Colors from '@/constants/Colors';
+import { styles } from '@/styles/auth.styles';
 
 const Login = () => {
   const { startSSOFlow } = useSSO();
@@ -16,19 +16,19 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const redirectUrl = Linking.createURL("/");
+      const redirectUrl = Linking.createURL('/');
 
       const { createdSessionId, setActive } = await startSSOFlow({
-        strategy: "oauth_google",
+        strategy: 'oauth_google',
         redirectUrl,
       });
 
       if (setActive && createdSessionId) {
         setActive({ session: createdSessionId });
-        router.replace("/(main)/(tabs)");
+        router.replace('/(main)/(tabs)');
       }
     } catch (error) {
-      console.log("OAuth error", error);
+      console.log('OAuth error', error);
     }
   };
 
@@ -44,7 +44,7 @@ const Login = () => {
 
       <View style={styles.illustrationContainer}>
         <Image
-          source={require("@/assets/images/auth-bg.png")}
+          source={require('@/assets/images/auth-bg.png')}
           style={styles.illustration}
           resizeMode="cover"
         />
@@ -54,7 +54,7 @@ const Login = () => {
         <CustomButton
           text="Sign in with Google"
           onPress={handleGoogleSignIn}
-          style={{ width: "100%", marginBottom: 10 }}
+          style={{ width: '100%', marginBottom: 10 }}
         />
       </View>
       <PrivacyTerms />

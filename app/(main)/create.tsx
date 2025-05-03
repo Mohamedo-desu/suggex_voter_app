@@ -1,19 +1,9 @@
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import styles from "@/styles/create.styles";
-import { createValidationSchema } from "@/utils/validation";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Picker } from "@react-native-picker/picker";
-import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "expo-router";
-import { Formik } from "formik";
-import React, { useRef, useState } from "react";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { Picker } from '@react-native-picker/picker';
+import { useMutation, useQuery } from 'convex/react';
+import { useRouter } from 'expo-router';
+import { Formik } from 'formik';
+import React, { useRef, useState } from 'react';
 import {
   Alert,
   Keyboard,
@@ -24,13 +14,18 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
+import CustomButton from '@/components/CustomButton';
+import CustomInput from '@/components/CustomInput';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
+import { api } from '@/convex/_generated/api';
+import styles from '@/styles/create.styles';
+import { createValidationSchema } from '@/utils/validation';
 
 const CreateScreen = () => {
-  const [newGroupName, setNewGroupName] = useState("");
-  const [newGroupStatus, setNewGroupStatus] = useState<"open" | "closed">(
-    "open"
-  );
+  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupStatus, setNewGroupStatus] = useState<'open' | 'closed'>('open');
   const [addingNewGroup, setAddingNewGroup] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const addGroup = useMutation(api.suggestion.addGroup);
@@ -43,7 +38,7 @@ const CreateScreen = () => {
     try {
       setSubmitting(true);
       if (!values.group) {
-        Alert.alert("Error", "Please select a group", [{ text: "OK" }]);
+        Alert.alert('Error', 'Please select a group', [{ text: 'OK' }]);
         setSubmitting(false);
         return;
       }
@@ -57,11 +52,8 @@ const CreateScreen = () => {
       resetForm();
       router.back();
     } catch (error) {
-      console.log("error submitting suggestion ", error);
-      ToastAndroid.show(
-        "Submission failed. Please try again.",
-        ToastAndroid.SHORT
-      );
+      console.log('error submitting suggestion ', error);
+      ToastAndroid.show('Submission failed. Please try again.', ToastAndroid.SHORT);
     } finally {
       setSubmitting(false);
     }
@@ -72,11 +64,11 @@ const CreateScreen = () => {
       setAddingNewGroup(true);
       if (newGroupName.trim()) {
         await addGroup({ groupName: newGroupName, status: newGroupStatus });
-        setNewGroupName("");
-        setNewGroupStatus("open");
+        setNewGroupName('');
+        setNewGroupStatus('open');
       }
     } catch (error) {
-      console.log("error in creating group", error);
+      console.log('error in creating group', error);
     } finally {
       setAddingNewGroup(false);
 
@@ -85,7 +77,7 @@ const CreateScreen = () => {
   };
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["80%"];
+  const snapPoints = ['80%'];
 
   const openEditSheet = () => {
     bottomSheetRef.current?.expand();
@@ -98,8 +90,8 @@ const CreateScreen = () => {
     <>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.container}>
@@ -107,15 +99,13 @@ const CreateScreen = () => {
               enableReinitialize
               initialValues={{
                 group: groups[0] || null,
-                suggestionTitle: "",
-                suggestionDescription: "",
+                suggestionTitle: '',
+                suggestionDescription: '',
                 endGoal: 100,
-                status: "open",
+                status: 'open',
               }}
               validationSchema={createValidationSchema}
-              onSubmit={(values, { resetForm }) =>
-                handleSubmitForm(values, resetForm)
-              }
+              onSubmit={(values, { resetForm }) => handleSubmitForm(values, resetForm)}
             >
               {({
                 handleChange,
@@ -127,23 +117,15 @@ const CreateScreen = () => {
                 setFieldValue,
               }) => (
                 <>
-                  <Text style={styles.sectionTitle}>
-                    Suggestion Group Details
-                  </Text>
+                  <Text style={styles.sectionTitle}>Suggestion Group Details</Text>
                   <View style={styles.pickerContainer}>
                     {groups.length > 0 ? (
                       <Picker
                         selectedValue={values.group?.groupName}
-                        onValueChange={(itemValue) =>
-                          setFieldValue("group", itemValue)
-                        }
+                        onValueChange={itemValue => setFieldValue('group', itemValue)}
                       >
-                        {groups.map((group) => (
-                          <Picker.Item
-                            key={group._id}
-                            label={group.groupName}
-                            value={group}
-                          />
+                        {groups.map(group => (
+                          <Picker.Item key={group._id} label={group.groupName} value={group} />
                         ))}
                       </Picker>
                     ) : (
@@ -161,10 +143,7 @@ const CreateScreen = () => {
                   >
                     Note:double check the group name
                   </Text>
-                  <CustomButton
-                    text="Create New Group"
-                    onPress={openEditSheet}
-                  />
+                  <CustomButton text="Create New Group" onPress={openEditSheet} />
                   {values.group !== null && (
                     <TouchableOpacity
                       style={{
@@ -172,14 +151,12 @@ const CreateScreen = () => {
                       }}
                       activeOpacity={1}
                     >
-                      <Text style={styles.sectionTitle}>
-                        Suggestion Details
-                      </Text>
+                      <Text style={styles.sectionTitle}>Suggestion Details</Text>
                       <CustomInput
                         value={values.suggestionTitle}
                         placeholder="Suggestion Title"
-                        handleChange={handleChange("suggestionTitle")}
-                        onBlur={handleBlur("suggestionTitle")}
+                        handleChange={handleChange('suggestionTitle')}
+                        onBlur={handleBlur('suggestionTitle')}
                         errors={errors.suggestionTitle}
                         touched={touched.suggestionTitle}
                         autoCorrect={true}
@@ -188,10 +165,10 @@ const CreateScreen = () => {
                       <CustomInput
                         value={values.suggestionDescription}
                         placeholder="Suggestion Description"
-                        handleChange={handleChange("suggestionDescription")}
-                        onBlur={handleBlur("suggestionDescription")}
+                        handleChange={handleChange('suggestionDescription')}
+                        onBlur={handleBlur('suggestionDescription')}
                         multiline
-                        style={[styles.textArea]}
+                        style={styles.textArea}
                         textAlignVertical="top"
                         maxLength={300}
                         errors={errors.suggestionDescription}
@@ -201,17 +178,15 @@ const CreateScreen = () => {
                         value={String(values.endGoal)}
                         placeholder="Final votes needed"
                         keyboardType="numeric"
-                        handleChange={handleChange("endGoal")}
-                        onBlur={handleBlur("endGoal")}
+                        handleChange={handleChange('endGoal')}
+                        onBlur={handleBlur('endGoal')}
                         errors={errors.endGoal}
                         touched={touched.endGoal}
                       />
                       <View style={styles.pickerContainer}>
                         <Picker
                           selectedValue={values.status}
-                          onValueChange={(itemValue) =>
-                            setFieldValue("status", itemValue)
-                          }
+                          onValueChange={itemValue => setFieldValue('status', itemValue)}
                         >
                           <Picker.Item label="open" value="open" />
                           <Picker.Item label="Approved" value="approved" />
@@ -237,7 +212,7 @@ const CreateScreen = () => {
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
-        backdropComponent={(props) => (
+        backdropComponent={props => (
           <BottomSheetBackdrop
             {...props}
             disappearsOnIndex={-1}
@@ -259,17 +234,13 @@ const CreateScreen = () => {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={newGroupStatus}
-                onValueChange={(itemValue) => setNewGroupStatus(itemValue)}
+                onValueChange={itemValue => setNewGroupStatus(itemValue)}
               >
                 <Picker.Item label="open" value="open" />
                 <Picker.Item label="Closed" value="closed" />
               </Picker>
             </View>
-            <CustomButton
-              text="Add Group"
-              onPress={handleAddGroup}
-              loading={addingNewGroup}
-            />
+            <CustomButton text="Add Group" onPress={handleAddGroup} loading={addingNewGroup} />
           </View>
         </BottomSheetView>
       </BottomSheet>

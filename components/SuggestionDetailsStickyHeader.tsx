@@ -1,21 +1,17 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { Image } from "expo-image";
-import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import AnimatedNumber from "react-native-animated-numbers";
-import Animated, {
-  Extrapolation,
-  interpolate,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import { Image } from 'expo-image';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import AnimatedNumber from 'react-native-animated-numbers';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 const SuggestionDetailsStickyHeader = ({ item, scrollY }) => {
   // Store the measured height of the header
   const [headerHeight, setHeaderHeight] = useState(0);
 
   // Capture the layout height on mount / change
-  const onLayoutHeader = (event) => {
+  const onLayoutHeader = event => {
     const { height } = event.nativeEvent.layout;
     setHeaderHeight(height);
   };
@@ -33,44 +29,33 @@ const SuggestionDetailsStickyHeader = ({ item, scrollY }) => {
 
     return {
       opacity,
-      pointerEvents: opacity === 0 ? "none" : "auto",
+      pointerEvents: opacity === 0 ? 'none' : 'auto',
     };
   });
 
   const { title, status, likesCount, commentsCount, imageUrl } = item || {};
-  const isActive = status === "open";
+  const isActive = status === 'open';
 
   return (
-    <Animated.View
-      style={[styles.stickyHeader, stickyHeaderStyle]}
-      onLayout={onLayoutHeader}
-    >
-      <View style={{ gap: 10, width: "100%" }}>
+    <Animated.View style={[styles.stickyHeader, stickyHeaderStyle]} onLayout={onLayoutHeader}>
+      <View style={{ gap: 10, width: '100%' }}>
         <View>
           <Text style={styles.groupNameText}>{title}</Text>
           <Text
-            style={[
-              styles.groupStatusText,
-              { color: isActive ? Colors.primary : Colors.error },
-            ]}
+            style={[styles.groupStatusText, { color: isActive ? Colors.primary : Colors.error }]}
           >
-            {isActive ? "Active" : "Inactive"}
+            {isActive ? 'Active' : 'Inactive'}
           </Text>
         </View>
         {imageUrl && (
-          <Image
-            source={imageUrl}
-            contentFit="cover"
-            style={styles.groupLogo}
-            transition={300}
-          />
+          <Image source={imageUrl} contentFit="cover" style={styles.groupLogo} transition={300} />
         )}
       </View>
 
       <View style={styles.statsContainer}>
         {[
-          { label: "upvotes", count: likesCount },
-          { label: "comments", count: commentsCount },
+          { label: 'upvotes', count: likesCount },
+          { label: 'comments', count: commentsCount },
         ].map(({ label, count }) => (
           <View key={label} style={styles.statItemContainer}>
             <Text style={styles.statLabel}>{label}:</Text>
@@ -90,53 +75,53 @@ const SuggestionDetailsStickyHeader = ({ item, scrollY }) => {
 export default SuggestionDetailsStickyHeader;
 
 const styles = StyleSheet.create({
-  stickyHeader: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: Colors.background,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    zIndex: 1000,
-    elevation: 10,
-    paddingHorizontal: 10,
-    gap: 10,
-    paddingBottom: 5,
-    borderBottomWidth: 1.5,
-    borderBottomColor: Colors.border,
-  },
   groupLogo: {
-    width: "100%",
     height: 100,
+    width: '100%',
   },
   groupNameText: {
-    fontSize: 12,
-    fontFamily: Fonts.Bold,
     color: Colors.textDark,
+    fontFamily: Fonts.Bold,
+    fontSize: 12,
   },
   groupStatusText: {
-    fontSize: 12,
     fontFamily: Fonts.Medium,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    fontSize: 12,
   },
   statItemContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   statLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
     color: Colors.placeholderText,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
     marginRight: 4,
   },
   statNumber: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
     color: Colors.primary,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  statsContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  stickyHeader: {
+    alignItems: 'flex-start',
+    backgroundColor: Colors.background,
+    borderBottomColor: Colors.border,
+    borderBottomWidth: 1.5,
+    elevation: 10,
+    gap: 10,
+    justifyContent: 'center',
+    left: 0,
+    paddingBottom: 5,
+    paddingHorizontal: 10,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1000,
   },
 });

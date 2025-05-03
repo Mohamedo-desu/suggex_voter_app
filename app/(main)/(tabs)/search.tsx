@@ -1,49 +1,39 @@
-import { useAuth } from "@clerk/clerk-expo";
-import { Ionicons } from "@expo/vector-icons";
-import Clipboard from "@react-native-clipboard/clipboard";
-import { useMutation, useQuery } from "convex/react";
-import { router } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useAuth } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { useMutation, useQuery } from 'convex/react';
+import { router } from 'expo-router';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import CustomButton from "@/components/CustomButton";
-import Empty from "@/components/Empty";
-import Loader from "@/components/Loader";
-import Suggestion from "@/components/Suggestion";
-import SuggestionGroup from "@/components/SuggestionGroup";
-import Colors from "@/constants/colors";
-import { api } from "@/convex/_generated/api";
-import styles from "@/styles/search.styles";
-import { GroupProps, SuggestionProps } from "@/types";
-import { debounce } from "@/utils/functions";
+import CustomButton from '@/components/CustomButton';
+import Empty from '@/components/Empty';
+import Loader from '@/components/Loader';
+import Suggestion from '@/components/Suggestion';
+import SuggestionGroup from '@/components/SuggestionGroup';
+import Colors from '@/constants/Colors';
+import { api } from '@/convex/_generated/api';
+import styles from '@/styles/search.styles';
+import { GroupProps, SuggestionProps } from '@/types';
+import { debounce } from '@/utils/functions';
 
 const SearchScreen: React.FC = () => {
-  const [result, setResult] = useState<GroupProps | SuggestionProps | null>(
-    null
-  );
-  const [searchPhrase, setSearchPhrase] = useState<string>("");
+  const [result, setResult] = useState<GroupProps | SuggestionProps | null>(null);
+  const [searchPhrase, setSearchPhrase] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [joining, setJoining] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
   const { userId } = useAuth();
 
-  const searchGroupsMutation = useMutation(
-    api.suggestion.searchGroupsByInvitationCode
-  );
-  const searchSuggestionsMutation = useMutation(
-    api.suggestion.searchSuggestionsByInvitationCode
-  );
-  const requestGroupJoinMutation = useMutation(
-    api.suggestion.requestToJoinGroup
-  );
-  const requestSuggestionJoinMutation = useMutation(
-    api.suggestion.requestToJoinSuggestion
-  );
+  const searchGroupsMutation = useMutation(api.suggestion.searchGroupsByInvitationCode);
+  const searchSuggestionsMutation = useMutation(api.suggestion.searchSuggestionsByInvitationCode);
+  const requestGroupJoinMutation = useMutation(api.suggestion.requestToJoinGroup);
+  const requestSuggestionJoinMutation = useMutation(api.suggestion.requestToJoinSuggestion);
 
   const handleSearch = useCallback(async () => {
     const trimmed = searchPhrase.trim();
-    const isGroup = trimmed.startsWith("grp") && trimmed.endsWith("G0g");
-    const isSuggestion = trimmed.startsWith("sug") && trimmed.endsWith("S0s");
+    const isGroup = trimmed.startsWith('grp') && trimmed.endsWith('G0g');
+    const isSuggestion = trimmed.startsWith('sug') && trimmed.endsWith('S0s');
 
     if (trimmed && (isGroup || isSuggestion)) {
       setLoading(true);
@@ -51,14 +41,14 @@ const SearchScreen: React.FC = () => {
         let res: any = null;
         if (isGroup) {
           res = await searchGroupsMutation({ invitationCode: trimmed });
-          setResultType("group");
+          setResultType('group');
         } else {
           res = await searchSuggestionsMutation({ invitationCode: trimmed });
-          setResultType("suggestion");
+          setResultType('suggestion');
         }
         setResult(res || null);
       } catch (e) {
-        console.error("Search failed: ", e);
+        console.error('Search failed: ', e);
         setResult(null);
       } finally {
         setLoading(false);
@@ -68,35 +58,29 @@ const SearchScreen: React.FC = () => {
     }
   }, [searchPhrase, searchGroupsMutation, searchSuggestionsMutation]);
 
-  const debouncedHandleSearch = useMemo(
-    () => debounce(handleSearch, 500),
-    [handleSearch]
-  );
+  const debouncedHandleSearch = useMemo(() => debounce(handleSearch, 500), [handleSearch]);
 
-  const currentUser = useQuery(
-    api.user.getUserByClerkId,
-    userId ? { clerkId: userId } : "skip"
-  );
+  const currentUser = useQuery(api.user.getUserByClerkId, userId ? { clerkId: userId } : 'skip');
 
   const handleRequestToJoin = async () => {
     if (!result || !userId || joining) return;
     try {
       setJoining(true);
-      if (resultType === "group") {
+      if (resultType === 'group') {
         await requestGroupJoinMutation({
           invitationCode: (result as GroupProps).invitationCode,
         });
-      } else if (resultType === "suggestion") {
+      } else if (resultType === 'suggestion') {
         await requestSuggestionJoinMutation({
           invitationCode: (result as SuggestionProps).invitationCode,
         });
       }
-      setSearchPhrase("");
+      setSearchPhrase('');
       setResult(null);
       setResultType(null);
       router.back();
     } catch (err) {
-      console.error("Request failed", err);
+      console.error('Request failed', err);
     } finally {
       setJoining(false);
     }
@@ -105,12 +89,11 @@ const SearchScreen: React.FC = () => {
   const handlePaste = async () => {
     const copiedText = await Clipboard.getString();
 
-    const isGroup = copiedText.startsWith("grp") && copiedText.endsWith("G0g");
-    const isSuggestion =
-      copiedText.startsWith("sug") && copiedText.endsWith("S0s");
+    const isGroup = copiedText.startsWith('grp') && copiedText.endsWith('G0g');
+    const isSuggestion = copiedText.startsWith('sug') && copiedText.endsWith('S0s');
 
     if (!isGroup && !isSuggestion) {
-      alert("Please paste the correct invitation code");
+      alert('Please paste the correct invitation code');
       return;
     }
 
@@ -126,7 +109,7 @@ const SearchScreen: React.FC = () => {
             placeholderTextColor={Colors.placeholderText}
             value={searchPhrase}
             autoCapitalize="none"
-            onChangeText={(text) => {
+            onChangeText={text => {
               setSearchPhrase(text);
               debouncedHandleSearch();
             }}
@@ -135,24 +118,16 @@ const SearchScreen: React.FC = () => {
           {searchPhrase.length > 0 && (
             <TouchableOpacity
               onPress={() => {
-                setSearchPhrase("");
+                setSearchPhrase('');
                 setResult(null);
               }}
               style={styles.iconWrapper}
               activeOpacity={0.8}
             >
-              <Ionicons
-                name="close-circle"
-                size={22}
-                color={Colors.placeholderText}
-              />
+              <Ionicons name="close-circle" size={22} color={Colors.placeholderText} />
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            onPress={handleSearch}
-            style={styles.iconWrapper}
-            activeOpacity={0.8}
-          >
+          <TouchableOpacity onPress={handleSearch} style={styles.iconWrapper} activeOpacity={0.8}>
             <Ionicons name="search" size={22} color={Colors.primary} />
           </TouchableOpacity>
         </View>
@@ -169,7 +144,7 @@ const SearchScreen: React.FC = () => {
         ) : result && userId ? (
           <>
             <Text style={styles.resultHeader}>Result</Text>
-            {resultType === "group" ? (
+            {resultType === 'group' ? (
               <SuggestionGroup item={result as GroupProps} userId={userId} />
             ) : (
               <Suggestion item={result as SuggestionProps} userId={userId} />
@@ -179,10 +154,7 @@ const SearchScreen: React.FC = () => {
               <CustomButton
                 text="Join"
                 onPress={handleRequestToJoin}
-                style={[
-                  styles.pasteButton,
-                  { backgroundColor: Colors.invited },
-                ]}
+                style={[styles.pasteButton, { backgroundColor: Colors.invited }]}
                 loading={joining}
               />
             )}

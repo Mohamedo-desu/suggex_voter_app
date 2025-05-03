@@ -5,7 +5,7 @@ const PROJECT_SLUG = "suggex";
 const OWNER = "mohamedo-desu";
 
 // App production config
-const APP_NAME = "Suggestions Box";
+const APP_NAME = "Voting Box";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
 const ICON = "./assets/icons/icon.png";
@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "2.0.0",
+    version: "3.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     newArchEnabled: true,
@@ -35,6 +35,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       package: packageName,
       softwareKeyboardLayoutMode: "pan",
+      edgeToEdgeEnabled: true,
     },
     updates: {
       url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
@@ -84,9 +85,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ],
         },
       ],
+      "expo-secure-store",
+      "expo-web-browser",
     ],
     experiments: {
       typedRoutes: true,
+      reactCanary: true,
+      remoteBuildCache: {
+        provider: "eas",
+      },
     },
     owner: OWNER,
   };

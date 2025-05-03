@@ -1,51 +1,46 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { Dimensions, Platform, StyleSheet } from "react-native";
-const { height, width } = Dimensions.get("window");
+import Colors from '@/constants/Colors';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
+  appName: {
+    color: Colors.textPrimary,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   brandSection: {
-    alignItems: "center",
-    marginTop: height * 0.12,
+    alignItems: 'center',
+    marginTop: 50,
   },
-  logoContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 18,
-    backgroundColor: "rgba(74, 222, 128, 0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  appName: {
-    fontSize: 35,
-    fontFamily: Fonts.Bold,
-    color: Colors.primary,
-    marginBottom: 8,
-  },
-  tagline: {
-    fontSize: 14,
-    color: Colors.placeholderText,
-  },
-  illustrationContainer: {
+  container: {
+    backgroundColor: Colors.background,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
   },
   illustration: {
-    width: Platform.OS === "web" ? width * 0.7 : width * 0.55,
-    height: Platform.OS === "web" ? width * 0.7 : width * 0.55,
-    maxHeight: 300,
-    maxWidth: 300,
+    height: '100%',
+    width: '100%',
+  },
+  illustrationContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   loginSection: {
-    width: "100%",
-    paddingHorizontal: 24,
-    alignItems: "center",
+    marginBottom: 20,
+    padding: 20,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    backgroundColor: Colors.primary + '15',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 20,
+    width: 80,
+  },
+  tagline: {
+    color: Colors.textSecondary,
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

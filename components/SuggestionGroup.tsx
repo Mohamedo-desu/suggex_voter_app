@@ -1,28 +1,17 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { api } from "@/convex/_generated/api";
-import { styles } from "@/styles/suggestionGroup.styles";
-import { GroupProps } from "@/types";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { useQuery } from "convex/react";
-import { formatDistanceToNowStrict } from "date-fns";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
-import {
-  StyleProp,
-  Text,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native";
-import AnimatedNumber from "react-native-animated-numbers";
-import Animated, {
-  LinearTransition,
-  ZoomIn,
-  ZoomOut,
-} from "react-native-reanimated";
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { useQuery } from 'convex/react';
+import { formatDistanceToNowStrict } from 'date-fns';
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import React, { useMemo } from 'react';
+import { StyleProp, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import AnimatedNumber from 'react-native-animated-numbers';
+import Animated, { LinearTransition, ZoomIn, ZoomOut } from 'react-native-reanimated';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
+import { api } from '@/convex/_generated/api';
+import { styles } from '@/styles/suggestionGroup.styles';
+import { GroupProps } from '@/types';
 
 const SuggestionGroup: React.FC<{
   item: GroupProps;
@@ -45,22 +34,19 @@ const SuggestionGroup: React.FC<{
     imageUrl,
   } = item || {};
 
-  const groupActive: boolean = status === "open";
-  const isPrivate: boolean = status === "private";
+  const groupActive: boolean = status === 'open';
+  const isPrivate: boolean = status === 'private';
 
   const statusColor: string = useMemo(() => {
     if (!groupActive && !isPrivate) return Colors.error;
-    return role === "owner" ? Colors.primary : Colors.invited;
+    return role === 'owner' ? Colors.primary : Colors.invited;
   }, [groupActive, role, isPrivate]);
 
   const displayName: string = useMemo(() => {
-    return groupName.length > 25 ? groupName.slice(0, 25) + "..." : groupName;
+    return groupName.length > 25 ? groupName.slice(0, 25) + '...' : groupName;
   }, [groupName]);
 
-  const currentUser = useQuery(
-    api.user.getUserByClerkId,
-    userId ? { clerkId: userId } : "skip"
-  );
+  const currentUser = useQuery(api.user.getUserByClerkId, userId ? { clerkId: userId } : 'skip');
   const isOwner = currentUser?._id === item.userId;
 
   const containerStyle: StyleProp<ViewStyle> = useMemo(
@@ -71,31 +57,22 @@ const SuggestionGroup: React.FC<{
         padding: 5,
         borderBottomLeftRadius: 5,
         borderBottomRightRadius: 5,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
       },
     ],
     [statusColor, groupActive, isPrivate, isOwner]
   );
 
-  const imageSource = imageUrl
-    ? imageUrl
-    : require("@/assets/icons/avatar.png");
+  const imageSource = imageUrl ? imageUrl : require('@/assets/icons/avatar.png');
 
   return (
-    <Animated.View
-      entering={ZoomIn.delay(index * 100)}
-      exiting={ZoomOut}
-      layout={LinearTransition}
-    >
+    <Animated.View entering={ZoomIn.delay(index * 100)} exiting={ZoomOut} layout={LinearTransition}>
       <TouchableOpacity
-        style={[
-          styles.container,
-          { opacity: groupActive || isOwner || isPrivate ? 1 : 0.6 },
-        ]}
+        style={[styles.container, { opacity: groupActive || isOwner || isPrivate ? 1 : 0.6 }]}
         onPress={() =>
           router.navigate({
-            pathname: "/(main)/groupDetails",
+            pathname: '/(main)/groupDetails',
             params: { groupId: _id },
           })
         }
@@ -104,7 +81,7 @@ const SuggestionGroup: React.FC<{
       >
         <View style={styles.iconContainer}>
           <FontAwesome5
-            name={isPrivate ? "lock" : groupActive ? "box-open" : "box"}
+            name={isPrivate ? 'lock' : groupActive ? 'box-open' : 'box'}
             size={14}
             color={Colors.placeholderText}
           />
@@ -112,20 +89,12 @@ const SuggestionGroup: React.FC<{
         <View style={styles.headerContainer}>
           <View style={styles.groupHeader}>
             <Image
-              source={
-                typeof imageSource === "string"
-                  ? { uri: imageSource }
-                  : imageSource
-              }
+              source={typeof imageSource === 'string' ? { uri: imageSource } : imageSource}
               contentFit="contain"
               style={styles.groupLogo}
               transition={300}
             />
-            <Text
-              style={styles.groupNameText}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
+            <Text style={styles.groupNameText} ellipsizeMode="tail" numberOfLines={1}>
               {displayName}
             </Text>
           </View>
@@ -137,18 +106,14 @@ const SuggestionGroup: React.FC<{
         </View>
         <View style={styles.statsContainer}>
           {[
-            { label: "suggestions", count: suggestionsCount },
-            { label: "approved", count: approvedCount },
-            { label: "rejected", count: rejectedCount },
+            { label: 'suggestions', count: suggestionsCount },
+            { label: 'approved', count: approvedCount },
+            { label: 'rejected', count: rejectedCount },
           ].map(({ label, count }) => (
             <View key={label} style={styles.statItemContainer}>
               <Text style={styles.statLabel}>{label} : </Text>
               {isPrivate ? (
-                <Ionicons
-                  name="eye-off"
-                  size={14}
-                  color={Colors.lightGray[500]}
-                />
+                <Ionicons name="eye-off" size={14} color={Colors.lightGray[500]} />
               ) : (
                 <AnimatedNumber
                   animateToNumber={count}
@@ -169,7 +134,7 @@ const SuggestionGroup: React.FC<{
             color: Colors.white,
           }}
         >
-          {item?.status === "open" ? "Active" : item?.status}
+          {item?.status === 'open' ? 'Active' : item?.status}
         </Text>
       </View>
     </Animated.View>

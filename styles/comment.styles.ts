@@ -1,28 +1,28 @@
-import Colors from "@/constants/colors";
-import { Fonts } from "@/constants/Fonts";
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { Fonts } from '@/constants/Fonts';
 
 export const styles = StyleSheet.create({
-  commentContainer: {
-    padding: 10,
-    backgroundColor: Colors.background,
-    borderRadius: 5,
-  },
   commentAuthor: {
-    fontSize: 10,
-    fontFamily: Fonts.Regular,
     color: Colors.primary,
+    fontFamily: Fonts.Regular,
+    fontSize: 10,
     marginBottom: 5,
   },
-  commentText: {
-    fontSize: 12,
-    fontFamily: Fonts.Regular,
-    color: Colors.textDark,
+  commentContainer: {
+    backgroundColor: Colors.background,
+    borderRadius: 5,
+    padding: 10,
   },
-  header: { flexDirection: "row", alignItems: "center" },
+  commentText: {
+    color: Colors.textDark,
+    fontFamily: Fonts.Regular,
+    fontSize: 12,
+  },
+  header: { alignItems: 'center', flexDirection: 'row' },
   headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
