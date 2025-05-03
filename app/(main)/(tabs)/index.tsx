@@ -1,3 +1,9 @@
+import Empty from '@/components/Empty';
+import Loader from '@/components/Loader';
+import SuggestionGroup from '@/components/SuggestionGroup';
+import Colors from '@/constants/Colors';
+import { api } from '@/convex/_generated/api';
+import { GroupProps } from '@/types';
 import { useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from 'convex/react';
@@ -5,12 +11,6 @@ import { useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, RefreshControl, TouchableOpacity } from 'react-native';
 import Animated, { Easing, LinearTransition } from 'react-native-reanimated';
-import Empty from '@/components/Empty';
-import Loader from '@/components/Loader';
-import SuggestionGroup from '@/components/SuggestionGroup';
-import Colors from '@/constants/Colors';
-import { api } from '@/convex/_generated/api';
-import { GroupProps } from '@/types';
 
 const SuggestionsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);

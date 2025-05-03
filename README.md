@@ -1,50 +1,113 @@
-# Welcome to your Expo app 👋
+# Live Voting App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern, real-time voting application built with React Native (Expo) and Convex backend. This app allows users to create and participate in live voting sessions with features like anonymous voting, real-time updates, and group management.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **User Authentication**: Secure login and registration using Clerk
+- **Voting Management**:
+  - Create, edit, and delete voting suggestions
+  - Set voting goals and track progress
+  - Private and public voting options
+  - Real-time vote counting
+- **Group Organization**:
+  - Create and manage voting groups
+  - Invite users to groups
+  - Set group permissions and visibility
+- **Comment System**:
+  - Anonymous commenting on suggestions
+  - Real-time comment updates
+  - Comment moderation
+- **User Profile**: View and manage your profile information
+- **Responsive UI**: Beautiful and intuitive interface with animations
+- **Real-time Updates**: Changes sync instantly across devices
+
+## Screenshots
+
+<!-- Add your screenshots here from assets/screenshots directory -->
+
+| Home Screen                            | Add Task Screen                                | Task Details                                           |
+| -------------------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| ![Home](./assets/screenshots/home.png) | ![Add Task](./assets/screenshots/add_task.png) | ![Task Details](./assets/screenshots/task_details.png) |
+
+## Tech Stack
+
+### Frontend
+
+- **React Native** with **Expo** - Mobile app framework
+- **TypeScript** - Type-safe JavaScript
+- **Expo Router** - File-based navigation system
+- **React Hook Form** - Form handling with validation
+- **Yup** - Schema validation
+- **React Native Reanimated** - Animations
+- **Shopify Restyle** - Styling system
+- **date-fns** - Date utility library
+
+### Backend
+
+- **Convex** - Backend-as-a-service for real-time data
+- **Clerk** - Authentication and user management
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm or Bun package manager
+- Expo CLI
+
+### Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone <repository-url>
+   cd live_voting_app
+   ```
+
+2. Install dependencies
 
    ```bash
    npm install
+   # or
+   bun install
    ```
 
-2. Start the app
-
+3. Start the development server
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Available Scripts
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- `npm run android` or `bun run android` - Run the app on an Android device/emulator
+- `npm run ios` or `bun run ios` - Run the app on an iOS simulator
+- `npm run update:app` - Update the app with EAS Update
+- `npm run publish:android` - Build Android app for preview
+- `npm run lint` - Lint the code
+- `npm run format` - Format the code with ESLint and Prettier
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Development
 
-## Get a fresh project
+The project follows a structured architecture:
 
-When you're ready, run:
+- `app/` - Main application routes
+  - `(auth)/` - Authentication screens
+  - `(main)/` - Main app screens
+    - `(tabs)/` - Tab navigation screens
+- `components/` - Reusable UI components
+- `styles/` - Styling configuration
+- `types/` - TypeScript type definitions
+- `convex/` - Backend API and schema definitions
+- `theme/` - Shopify Restyle theme configuration
 
-```bash
-npm run reset-project
-```
+## Lessons Learned
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Building a real-time voting system with Convex backend
+- Implementing anonymous commenting and voting features
+- Managing group permissions and visibility
+- Creating responsive UI with Shopify Restyle
 
-## Learn more
+## License
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT License](LICENSE)

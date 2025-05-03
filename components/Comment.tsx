@@ -1,13 +1,13 @@
+import Colors from '@/constants/Colors';
+import { api } from '@/convex/_generated/api';
+import { styles } from '@/styles/comment.styles';
+import { CommentProps } from '@/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMutation, useQuery } from 'convex/react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated';
-import Colors from '@/constants/Colors';
-import { api } from '@/convex/_generated/api';
-import { styles } from '@/styles/comment.styles';
-import { CommentProps } from '@/types';
 
 interface CommentItemProps {
   item: CommentProps;

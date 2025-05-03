@@ -1,13 +1,15 @@
+import InitialLayout from '@/components/InitialLayout';
+import Colors from '@/constants/Colors';
+import ClerkAndConvexProvider from '@/providers/ClerkAndConvexProvider';
+import theme from '@/theme';
 import * as Sentry from '@sentry/react-native';
+import { ThemeProvider } from '@shopify/restyle';
 import { useNavigationContainerRef } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Updates from 'expo-updates';
 import React, { useEffect } from 'react';
 import { LogBox, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import InitialLayout from '@/components/InitialLayout';
-import Colors from '@/constants/Colors';
-import ClerkAndConvexProvider from '@/providers/ClerkAndConvexProvider';
 
 LogBox.ignoreLogs(['Clerk: Clerk has been loaded with development keys.']);
 
@@ -81,7 +83,9 @@ const RootLayout: React.FC = () => {
   return (
     <ClerkAndConvexProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <InitialLayout />
+        <ThemeProvider theme={theme}>
+          <InitialLayout />
+        </ThemeProvider>
       </GestureHandlerRootView>
     </ClerkAndConvexProvider>
   );
